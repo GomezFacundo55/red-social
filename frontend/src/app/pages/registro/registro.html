@@ -1,1 +1,99 @@
-<p>registro works!</p>
+<div class="container py-5 d-flex justify-content-center">
+  <div class="card shadow p-4" style="max-width: 560px; width: 100%;">
+    <h2 class="text-center mb-4">Crear cuenta</h2>
+
+    <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Nombre</label>
+          <input type="text" class="form-control" formControlName="nombre"
+                 [class.is-invalid]="f.nombre.invalid && f.nombre.touched">
+          <div class="invalid-feedback">Ingresá tu nombre.</div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Apellido</label>
+          <input type="text" class="form-control" formControlName="apellido"
+                 [class.is-invalid]="f.apellido.invalid && f.apellido.touched">
+          <div class="invalid-feedback">Ingresá tu apellido.</div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Correo</label>
+        <input type="email" class="form-control" formControlName="correo"
+               [class.is-invalid]="f.correo.invalid && f.correo.touched">
+        <div class="invalid-feedback">
+          @if (f.correo.errors?.['required']) { El correo es obligatorio. }
+          @else { Ingresá un correo válido. }
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Nombre de usuario</label>
+        <input type="text" class="form-control" formControlName="usuario"
+               [class.is-invalid]="f.usuario.invalid && f.usuario.touched">
+        <div class="invalid-feedback">
+          @if (f.usuario.errors?.['required']) { El nombre de usuario es obligatorio. }
+          @else { Mínimo 3 caracteres. }
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-control" formControlName="password"
+               [class.is-invalid]="f.password.invalid && f.password.touched">
+        <div class="invalid-feedback">
+          @if (f.password.errors?.['required']) { La contraseña es obligatoria. }
+          @else {
+            @if (f.password.errors?.['minlength']) { <div>Mínimo 8 caracteres.</div> }
+            @if (f.password.errors?.['sinMayuscula']) { <div>Debe tener una mayúscula.</div> }
+            @if (f.password.errors?.['sinNumero']) { <div>Debe tener un número.</div> }
+          }
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Repetir contraseña</label>
+        <input type="password" class="form-control" formControlName="repetirPassword"
+               [class.is-invalid]="(f.repetirPassword.touched) && (f.repetirPassword.invalid || form.errors?.['noCoinciden'])">
+        <div class="invalid-feedback">
+          @if (f.repetirPassword.errors?.['required']) { Repetí la contraseña. }
+          @else { Las contraseñas no coinciden. }
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Fecha de nacimiento</label>
+        <input type="date" class="form-control" formControlName="fechaNacimiento"
+               [class.is-invalid]="f.fechaNacimiento.invalid && f.fechaNacimiento.touched">
+        <div class="invalid-feedback">
+          @if (f.fechaNacimiento.errors?.['required']) { La fecha es obligatoria. }
+          @else { La fecha no puede ser futura. }
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Descripción breve</label>
+        <textarea rows="3" class="form-control" formControlName="descripcion"
+                  [class.is-invalid]="f.descripcion.invalid && f.descripcion.touched"></textarea>
+        <div class="invalid-feedback">
+          @if (f.descripcion.errors?.['required']) { Escribí una descripción. }
+          @else { Máximo 200 caracteres. }
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Imagen de perfil</label>
+        <input type="file" class="form-control" accept="image/*"
+               (change)="onArchivo($event)" [class.is-invalid]="errorImagen">
+        <div class="invalid-feedback">{{ errorImagen }}</div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Registrarme</button>
+    </form>
+
+    <p class="text-center mt-3 mb-0">
+      ¿Ya tenés cuenta? <a routerLink="/login">Iniciá sesión</a>
+    </p>
+  </div>
+</div>
