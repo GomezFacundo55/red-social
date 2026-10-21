@@ -1,9 +1,34 @@
-import { Component } from '@angular/core';
+import { Component,inject } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { passwordFuerte } from '../../validators/password.validators';
+
 
 @Component({
-  imports: [],
   selector: 'app-login',
-  styleUrl: './login.css',
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
+  styleUrl: './login.css',
 })
-export class Login {}
+export class Login {
+
+    private fb = inject(FormBuilder);
+    
+    form = this.fb.group({
+    usuario: ['', [Validators.required]],
+    password: ['', [Validators.required, Validators.minLength(8), passwordFuerte]],
+  });
+
+  
+
+  get usuario() { return this.form.controls.usuario; }
+  get password() { return this.form.controls.password; }
+
+  enviar() {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    console.log(this.form.value); // más adelante: llamada al backend
+  }
+}

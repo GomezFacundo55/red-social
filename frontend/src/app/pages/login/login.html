@@ -1,1 +1,39 @@
 <p>login works!</p>
+<div class="container min-vh-100 d-flex align-items-center justify-content-center">
+  <div class="card shadow p-4" style="max-width: 420px; width: 100%;">
+    <h2 class="text-center mb-4">Iniciar sesión</h2>
+
+    <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+      <div class="mb-3">
+        <label class="form-label">Correo o usuario</label>
+        <input type="text" class="form-control" formControlName="usuario"
+               [class.is-invalid]="usuario.invalid && usuario.touched">
+        @if (usuario.touched && usuario.errors?.['required']) {
+          <div class="invalid-feedback">Ingresá tu correo o nombre de usuario.</div>
+        }
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-control" formControlName="password"
+               [class.is-invalid]="password.invalid && password.touched">
+        @if (password.touched && password.errors) {
+          <div class="invalid-feedback">
+            @if (password.errors['required']) { La contraseña es obligatoria. }
+            @else {
+              @if (password.errors['minlength']) { <div>Mínimo 8 caracteres.</div> }
+              @if (password.errors['sinMayuscula']) { <div>Debe tener una mayúscula.</div> }
+              @if (password.errors['sinNumero']) { <div>Debe tener un número.</div> }
+            }
+          </div>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+    </form>
+
+    <p class="text-center mt-3 mb-0">
+      ¿No tenés cuenta? <a routerLink="/registro">Registrate</a>
+    </p>
+  </div>
+</div>
