@@ -1,0 +1,63 @@
+.register-shell {
+  grid-template-columns: 0.72fr 1.28fr;
+}
+
+.register-card {
+  max-width: 720px;
+  padding: 48px clamp(28px, 5vw, 58px);
+}
+
+.register-card .auth-heading {
+  margin-bottom: 26px;
+}
+
+.register-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+  row-gap: 17px;
+}
+
+.register-field {
+  min-width: 0;
+}
+
+.field-wide {
+  grid-column: 1 / -1;
+}
+
+.register-field textarea.form-control {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.register-card .auth-submit {
+  margin-top: 24px;
+}
+
+@media (max-width: 760px) {
+  .register-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .register-card {
+    max-width: none;
+    padding: 30px 24px;
+  }
+
+  .register-fields {
+    column-gap: 12px;
+    row-gap: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .register-field,
+  .field-wide {
+    grid-column: 1;
+  }
+}

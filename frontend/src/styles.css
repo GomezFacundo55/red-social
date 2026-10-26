@@ -1,1 +1,396 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  color-scheme: dark;
+  --color-principal: #873bff;
+  --color-principal-oscuro: #7130df;
+  --color-principal-rgb: 135, 59, 255;
+  --color-principal-oscuro-rgb: 113, 48, 223;
+  --color-azul: #2878ff;
+  --color-fondo: #090e25;
+  --color-superficie: #171d3d;
+  --color-texto: #f4f5ff;
+  --color-texto-secundario: #a7b0d0;
+  --color-borde: rgba(140, 130, 255, 0.18);
+  --bs-primary: var(--color-principal);
+  --bs-primary-rgb: var(--color-principal-rgb);
+  --bs-link-color-rgb: 196, 107, 255;
+  --bs-link-hover-color-rgb: 135, 59, 255;
+  --bs-body-bg: var(--color-fondo);
+  --bs-body-color: var(--color-texto);
+  --bs-border-color: var(--color-borde);
+  --bs-secondary-color: var(--color-texto-secundario);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--color-fondo);
+}
+
+  
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--color-texto);
+  background:
+    radial-gradient(
+      ellipse at 12% 8%,
+      rgba(40, 120, 255, 0.12),
+      transparent 34rem
+    ),
+    radial-gradient(
+      ellipse at 92% 84%,
+      rgba(135, 59, 255, 0.12),
+      transparent 32rem
+    ),
+    var(--color-fondo);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: #c46bff;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+a:hover {
+  color: #d7a0ff;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(196, 107, 255, 0.8);
+  outline-offset: 3px;
+}
+
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--color-principal);
+  --bs-btn-border-color: transparent;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #7130df;
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #6428ca;
+  --bs-btn-active-border-color: transparent;
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: #7130df;
+  --bs-btn-disabled-border-color: transparent;
+  --bs-btn-focus-shadow-rgb: var(--color-principal-rgb);
+  border-radius: 12px;
+  background-image: linear-gradient(110deg, #873bff, #2878ff);
+  box-shadow: 0 8px 20px rgba(89, 73, 220, 0.2);
+  font-weight: 650;
+  transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 10px 24px rgba(89, 73, 220, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.form-label {
+  margin-bottom: 0.5rem;
+  color: #e2e6fb;
+  font-size: 0.9rem;
+  font-weight: 550;
+}
+
+.form-control {
+  min-height: 48px;
+  border: 1px solid rgba(167, 176, 208, 0.2);
+  border-radius: 11px;
+  color: var(--color-texto);
+  background-color: rgba(9, 14, 37, 0.58);
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.form-control::placeholder {
+  color: #7f89aa;
+}
+
+.form-control:focus {
+  border-color: #8d5cff;
+  color: var(--color-texto);
+  background-color: rgba(9, 14, 37, 0.82);
+  box-shadow: 0 0 0 3px rgba(135, 59, 255, 0.18);
+}
+
+.form-control[type="file"] {
+  padding: 0.55rem 0.75rem;
+}
+
+.form-control[type="file"]::file-selector-button {
+  margin: -0.15rem 0.75rem -0.15rem -0.15rem;
+  padding: 0.45rem 0.7rem;
+  border: 0;
+  border-radius: 8px;
+  color: #e8ddff;
+  background: rgba(135, 59, 255, 0.18);
+}
+
+.form-control.is-invalid,
+.was-validated .form-control:invalid {
+  border-color: #ff718d;
+  background-image: none;
+}
+
+.invalid-feedback {
+  color: #ff9aab;
+}
+
+.auth-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 48px 24px;
+}
+
+.auth-shell {
+  position: relative;
+  display: grid;
+  width: min(100%, 1080px);
+  overflow: hidden;
+  border: 1px solid var(--color-borde);
+  border-radius: 24px;
+  background: rgba(23, 29, 61, 0.88);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.3);
+}
+
+.auth-brand {
+  position: relative;
+  display: flex;
+  min-height: 580px;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 38px;
+  background:
+    radial-gradient(ellipse at 2% 92%, rgba(40, 120, 255, 0.36), transparent 55%),
+    linear-gradient(145deg, #211d54, #171d3d 78%);
+}
+
+.brand-lockup {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 720;
+  letter-spacing: -0.03em;
+}
+
+.brand-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  object-fit: cover;
+  mix-blend-mode: screen;
+}
+
+.brand-message {
+  position: relative;
+  z-index: 1;
+  max-width: 340px;
+  padding-bottom: 16px;
+}
+
+.brand-kicker,
+.auth-eyebrow {
+  color: #c69aff;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.brand-message h2 {
+  margin: 15px 0 12px;
+  color: #fff;
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  font-weight: 720;
+  letter-spacing: -0.045em;
+  line-height: 1.12;
+}
+
+.brand-message p,
+.auth-heading p {
+  margin: 0;
+  color: var(--color-texto-secundario);
+  line-height: 1.7;
+}
+
+.brand-orbit {
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  border: 1px solid rgba(196, 107, 255, 0.14);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.brand-orbit-one {
+  top: 29%;
+  right: -155px;
+}
+
+.brand-orbit-two {
+  top: 36%;
+  right: -120px;
+  width: 170px;
+  height: 170px;
+}
+
+.auth-card {
+  align-self: center;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 64px clamp(28px, 6vw, 72px);
+}
+
+.auth-heading {
+  margin-bottom: 34px;
+}
+
+.auth-heading h1 {
+  margin: 10px 0 8px;
+  color: var(--color-texto);
+  font-size: clamp(1.9rem, 3vw, 2.35rem);
+  font-weight: 720;
+  letter-spacing: -0.045em;
+}
+
+.auth-submit {
+  min-height: 50px;
+  margin-top: 5px;
+}
+
+.auth-footer {
+  margin: 28px 0 0;
+  color: var(--color-texto-secundario);
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+.auth-footer a {
+  margin-left: 4px;
+  font-weight: 650;
+}
+
+::selection {
+  color: white;
+  background: rgba(135, 59, 255, 0.65);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .auth-page {
+    padding: 20px 14px;
+  }
+
+  .auth-shell {
+    grid-template-columns: 1fr;
+    border-radius: 20px;
+  }
+
+  .auth-brand {
+    min-height: auto;
+    gap: 20px;
+    padding: 20px 24px;
+  }
+
+  .brand-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .brand-message {
+    padding: 0 0 4px;
+  }
+
+  .brand-message h2 {
+    max-width: 440px;
+    margin: 9px 0 5px;
+    font-size: 1.55rem;
+  }
+
+  .brand-message p {
+    font-size: 0.9rem;
+  }
+
+  .brand-orbit {
+    top: -130px;
+    right: -80px;
+  }
+
+  .auth-card {
+    max-width: none;
+    padding: 34px 24px 30px;
+  }
+
+  .auth-heading {
+    margin-bottom: 26px;
+  }
+}
+
+@media (max-width: 380px) {
+  .auth-page {
+    padding: 12px 8px;
+  }
+
+  .auth-brand {
+    padding: 18px;
+  }
+
+  .auth-card {
+    padding: 28px 18px 24px;
+  }
+}
+
+@media (min-width: 761px) and (max-height: 700px) {
+  .auth-page {
+    min-height: auto;
+    padding-block: 8px;
+  }
+
+  .auth-brand {
+    min-height: 480px;
+    padding-block: 30px;
+  }
+
+  .auth-card {
+    padding-block: 38px;
+  }
+}

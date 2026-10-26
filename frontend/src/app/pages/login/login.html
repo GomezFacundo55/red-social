@@ -1,39 +1,58 @@
-<p>login works!</p>
-<div class="container min-vh-100 d-flex align-items-center justify-content-center">
-  <div class="card shadow p-4" style="max-width: 420px; width: 100%;">
-    <h2 class="text-center mb-4">Iniciar sesión</h2>
+<main class="auth-page login-page">
+  <div class="auth-shell login-shell">
+    <aside class="auth-brand" aria-label="Red-Social">
+      <div class="brand-lockup">
+        <img src="red-social.jpg" alt="" class="brand-logo">
+        <span>Red-Social</span>
+      </div>
+      <div class="brand-message">
+        <span class="brand-kicker">TU ESPACIO, TU COMUNIDAD</span>
+        <h2>Las buenas conexiones empiezan acá.</h2>
+        <p>Un lugar para compartir lo que te inspira y estar cerca de tu gente.</p>
+      </div>
+      <span class="brand-orbit brand-orbit-one" aria-hidden="true"></span>
+      <span class="brand-orbit brand-orbit-two" aria-hidden="true"></span>
+    </aside>
 
-    <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
-      <div class="mb-3">
-        <label class="form-label">Correo o usuario</label>
-        <input type="text" class="form-control" formControlName="usuario"
-               [class.is-invalid]="usuario.invalid && usuario.touched">
-        @if (usuario.touched && usuario.errors?.['required']) {
-          <div class="invalid-feedback">Ingresá tu correo o nombre de usuario.</div>
-        }
+    <section class="auth-card" aria-labelledby="login-title">
+      <div class="auth-heading">
+        <span class="auth-eyebrow">BIENVENIDO DE NUEVO</span>
+        <h1 id="login-title">Iniciar sesión</h1>
+        <p>Ingresá tus datos para continuar.</p>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">Contraseña</label>
-        <input type="password" class="form-control" formControlName="password"
-               [class.is-invalid]="password.invalid && password.touched">
-        @if (password.touched && password.errors) {
-          <div class="invalid-feedback">
-            @if (password.errors['required']) { La contraseña es obligatoria. }
-            @else {
-              @if (password.errors['minlength']) { <div>Mínimo 8 caracteres.</div> }
-              @if (password.errors['sinMayuscula']) { <div>Debe tener una mayúscula.</div> }
-              @if (password.errors['sinNumero']) { <div>Debe tener un número.</div> }
-            }
-          </div>
-        }
-      </div>
+      <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+        <div class="mb-4">
+          <label class="form-label" for="login-usuario">Correo o usuario</label>
+          <input id="login-usuario" type="text" class="form-control" formControlName="usuario"
+                 autocomplete="username" [class.is-invalid]="usuario.invalid && usuario.touched">
+          @if (usuario.touched && usuario.errors?.['required']) {
+            <div class="invalid-feedback">Ingresá tu correo o nombre de usuario.</div>
+          }
+        </div>
 
-      <button type="submit" class="btn btn-primary w-100">Ingresar</button>
-    </form>
+        <div class="mb-4">
+          <label class="form-label" for="login-password">Contraseña</label>
+          <input id="login-password" type="password" class="form-control" formControlName="password"
+                 autocomplete="current-password" [class.is-invalid]="password.invalid && password.touched">
+          @if (password.touched && password.errors) {
+            <div class="invalid-feedback">
+              @if (password.errors['required']) { La contraseña es obligatoria. }
+              @else {
+                @if (password.errors['minlength']) { <div>Mínimo 8 caracteres.</div> }
+                @if (password.errors['sinMayuscula']) { <div>Debe tener una mayúscula.</div> }
+                @if (password.errors['sinNumero']) { <div>Debe tener un número.</div> }
+              }
+            </div>
+          }
+        </div>
 
-    <p class="text-center mt-3 mb-0">
-      ¿No tenés cuenta? <a routerLink="/registro">Registrate</a>
-    </p>
+        <button type="submit" class="btn btn-primary auth-submit w-100">Ingresar</button>
+      </form>
+
+      <p class="auth-footer">
+        ¿No tenés cuenta? <a routerLink="/registro">Registrate</a>
+      </p>
+    </section>
   </div>
-</div>
+</main>
