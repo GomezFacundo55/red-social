@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
-
+//molde unico que usa red social para cualquier operación relacionada con los usuarios en la base de datos
 @Schema({ timestamps: true })
 export class User {
   @Prop({ required: true }) nombre: string;
