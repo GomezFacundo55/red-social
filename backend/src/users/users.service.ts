@@ -18,4 +18,10 @@ export class UsersService {
   buscarPorUsuario(usuario: string) {
     return this.userModel.findOne({ usuario: usuario.trim() });
   }
+  buscarPorCorreoOUsuario(identificador: string) {
+  const valor = identificador.trim();
+  return this.userModel.findOne({
+    $or: [{ correo: valor.toLowerCase() }, { usuario: valor }],
+  });
+}
 }

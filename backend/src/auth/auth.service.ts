@@ -1,11 +1,18 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { UsersService } from '../users/users.service.js';
 import { RegistroDto } from './dto/registro.dto.js';
+import { LoginDto } from './dto/login.dto.js';
 import type { ArchivoSubido } from './archivo-subido.js';
 
 const EXTENSIONES: Record<string, string> = {
@@ -20,6 +27,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private config: ConfigService,
+    private jwtService: JwtService,
   ) {}
 
   async registro(dto: RegistroDto, imagen?: ArchivoSubido) {
@@ -63,5 +71,25 @@ export class AuthService {
 
     const { password, ...datos } = usuario.toObject();
     return datos; // sin la contraseña
+  }
+
+  async login(dto: LoginDto) {
+    const usuario = await this.usersService.buscarPorCorreoOUsuario(dto.usuario);
+    const passwordOk = usuario
+      ? await bcrypt.compare(dto.password, usuario.password)
+      : false;
+
+    if (!usuario || !passwordOk) {
+      throw new UnauthorizedException('Usuario o contraseña incorrectos.');
+    }
+
+    const token = await this.jwtService.signAsync({
+      sub: usuario._id.toString(),
+      usuario: usuario.usuario,
+      perfil: usuario.perfil,
+    });
+
+    const { password, ...datos } = usuario.toObject();
+    return { token, usuario: datos };
   }
 }

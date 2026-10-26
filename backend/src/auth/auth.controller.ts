@@ -1,4 +1,5 @@
-import { Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { LoginDto } from './dto/login.dto.js';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthService } from './auth.service.js';
 import { RegistroDto } from './dto/registro.dto.js';
@@ -13,4 +14,10 @@ export class AuthController {
   registro(@Body() dto: RegistroDto, @UploadedFile() imagen?: ArchivoSubido) {
     return this.authService.registro(dto, imagen);
   }
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  login(@Body() dto: LoginDto) {
+    return this.authService.login(dto);
+}
+  
 }
