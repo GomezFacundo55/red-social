@@ -100,6 +100,9 @@
               @else { Máximo 200 caracteres. }
             </div>
           </div>
+          <button type="submit" class="btn btn-primary w-100" [disabled]="enviando">
+  {{ enviando ? 'Registrando...' : 'Registrarme' }}
+</button>
 
           <div class="register-field field-wide">
             <label class="form-label" for="registro-imagen">Imagen de perfil</label>
@@ -117,4 +120,23 @@
       </p>
     </section>
   </div>
+  @if (modal) {
+  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ modal.titulo }}</h5>
+        </div>
+        <div class="modal-body">
+          @for (mensaje of modal.mensajes; track $index) {
+            <p class="mb-1">{{ mensaje }}</p>
+          }
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="cerrarModal()">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
 </main>

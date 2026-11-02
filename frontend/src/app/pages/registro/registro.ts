@@ -1,8 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router,RouterLink } from '@angular/router';
 import { passwordFuerte } from '../../validators/password.validators';
 import { passwordsCoinciden } from '../../validators/coincidir.validators';
+import { HttpErrorResponse } from '@angular/common/http';
+import { AuthService } from '../../services/auth.service';
+
 
 function fechaNoFutura(control: AbstractControl): ValidationErrors | null {
   if (!control.value) return null;
@@ -17,9 +20,13 @@ function fechaNoFutura(control: AbstractControl): ValidationErrors | null {
 })
 export class Registro {
   private fb = inject(FormBuilder);
+  private auth = inject(AuthService);
+  private router = inject(Router);
 
   imagen: File | null = null;
   errorImagen = '';
+  enviando = false;
+  modal: { titulo: string; mensajes: string[]; exito: boolean } | null = null;
 
   form = this.fb.group(
     {
@@ -57,13 +64,52 @@ export class Registro {
   }
 
   enviar() {
-    if (this.form.invalid || !this.imagen) {
-      this.form.markAllAsTouched();
-      if (!this.imagen && !this.errorImagen) {
-        this.errorImagen = 'Seleccioná una imagen de perfil.';
-      }
-      return;
+  if (this.form.invalid || !this.imagen) {
+    this.form.markAllAsTouched();
+    if (!this.imagen && !this.errorImagen) {
+      this.errorImagen = 'Seleccioná una imagen de perfil.';
     }
-    console.log(this.form.value, this.imagen); // después: envío al backend
+    return;
   }
+
+  const datos = new FormData();
+  Object.entries(this.form.getRawValue()).forEach(([clave, valor]) =>
+    datos.append(clave, valor ?? ''),
+  );
+  datos.append('imagen', this.imagen);
+
+  this.enviando = true;
+  this.auth.registro(datos).subscribe({
+    next: () => {
+      this.enviando = false;
+      this.modal = {
+        exito: true,
+        titulo: '¡Cuenta creada!',
+        mensajes: ['Tu registro se completó. Ya podés iniciar sesión.'],
+      };
+    },
+    error: (err: HttpErrorResponse) => {
+      this.enviando = false;
+      this.modal = {
+        exito: false,
+        titulo: 'No se pudo completar el registro',
+        mensajes: this.mensajesDeError(err),
+      };
+    },
+  });
+}
+
+private mensajesDeError(err: HttpErrorResponse): string[] {
+  if (err.status === 0) {
+    return ['No se pudo conectar con el servidor. Probá de nuevo en unos minutos.'];
+  }
+  const mensaje = err.error?.message;
+  return Array.isArray(mensaje) ? mensaje : [mensaje ?? 'Ocurrió un error inesperado.'];
+}
+
+cerrarModal() {
+  const exito = this.modal?.exito;
+  this.modal = null;
+  if (exito) this.router.navigate(['/login']);
+}
 }
