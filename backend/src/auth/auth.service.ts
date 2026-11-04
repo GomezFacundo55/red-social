@@ -7,20 +7,12 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
-import { randomUUID } from 'node:crypto';
-import { mkdir, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
 import { UsersService } from '../users/users.service.js';
 import { RegistroDto } from './dto/registro.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import type { ArchivoSubido } from './archivo-subido.js';
 
-const EXTENSIONES: Record<string, string> = {
-  'image/jpeg': '.jpg',
-  'image/png': '.png',
-  'image/webp': '.webp',
-  'image/gif': '.gif',
-};
+const TIPOS_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
 @Injectable()
 export class AuthService {
@@ -37,8 +29,7 @@ export class AuthService {
     if (!imagen) {
       throw new BadRequestException('La imagen de perfil es obligatoria.');
     }
-    const extension = EXTENSIONES[imagen.mimetype];
-    if (!extension) {
+    if (!TIPOS_PERMITIDOS.includes(imagen.mimetype)) {
       throw new BadRequestException('La imagen debe ser JPG, PNG, WEBP o GIF.');
     }
     if (await this.usersService.buscarPorCorreo(dto.correo)) {
@@ -48,13 +39,10 @@ export class AuthService {
       throw new ConflictException('Ese nombre de usuario ya está en uso.');
     }
 
-    // Guardar la imagen en disco y armar su URL
-    const carpeta = join(process.cwd(), 'uploads');
-    await mkdir(carpeta, { recursive: true });
-    const nombreArchivo = `${randomUUID()}${extension}`;
-    await writeFile(join(carpeta, nombreArchivo), imagen.buffer);
+    // Guardar la imagen en la base y armar su URL
+    const imagenId = await this.usersService.guardarImagen(imagen.mimetype, imagen.buffer);
     const baseUrl = this.config.get<string>('BASE_URL') ?? 'http://localhost:3000';
-    const imagenPerfil = `${baseUrl}/uploads/${nombreArchivo}`;
+    const imagenPerfil = `${baseUrl}/users/imagen/${imagenId}`;
 
     // Encriptar la contraseña y crear el usuario
     const passwordHash = await bcrypt.hash(dto.password, 10);
@@ -70,7 +58,7 @@ export class AuthService {
     });
 
     const { password, ...datos } = usuario.toObject();
-    return datos; // sin la contraseña
+    return datos;
   }
 
   async login(dto: LoginDto) {
