@@ -13,7 +13,7 @@ interface Sesion {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
-  private api = environment.apiUrl;
+  private api = environment.apiUrl.replace(/\/+$/, '');
 
   private sesion = signal<Sesion | null>(this.leerSesion());
 
