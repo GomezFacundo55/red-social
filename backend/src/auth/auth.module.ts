@@ -9,6 +9,7 @@ import { UsersModule } from '../users/users.module.js';
   imports: [
     UsersModule,
     JwtModule.registerAsync({
+      global: true,
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow<string>('JWT_SECRET'),
