@@ -1,1 +1,42 @@
-<p>mi-perfil works!</p>
+<main class="container py-4" style="max-width: 760px;">
+  @if (usuario(); as u) {
+    <section class="card shadow-sm mb-4">
+      <div class="card-body">
+        <div class="d-flex flex-column flex-sm-row align-items-center gap-3 mb-3">
+          <img [src]="u.imagenPerfil" alt="Foto de perfil" width="120" height="120"
+               class="rounded-circle object-fit-cover border">
+          <div class="text-center text-sm-start">
+            <h1 class="h3 mb-1">{{ u.nombre }} {{ u.apellido }}</h1>
+            <p class="text-body-secondary mb-1">&#64;{{ u.usuario }}</p>
+            <span class="badge text-bg-primary">{{ u.perfil }}</span>
+          </div>
+        </div>
+
+        <p class="mb-3">{{ u.descripcion }}</p>
+
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Correo</dt>
+          <dd class="col-sm-8">{{ u.correo }}</dd>
+          <dt class="col-sm-4">Fecha de nacimiento</dt>
+          <dd class="col-sm-8">{{ u.fechaNacimiento | date: 'dd/MM/yyyy' : 'UTC' }}</dd>
+          <dt class="col-sm-4">Miembro desde</dt>
+          <dd class="col-sm-8 mb-0">{{ u.createdAt | date: 'dd/MM/yyyy' }}</dd>
+        </dl>
+      </div>
+    </section>
+
+    <h2 class="h5 mb-3">Mis últimas publicaciones</h2>
+
+    @if (cargando()) {
+      <p class="text-body-secondary">Cargando publicaciones...</p>
+    } @else if (error()) {
+      <p class="text-danger">{{ error() }}</p>
+    } @else if (publicaciones().length === 0) {
+      <p class="text-body-secondary">Todavía no publicaste nada.</p>
+    }
+
+    @for (p of publicaciones(); track p._id) {
+      <app-publicacion-card [publicacion]="p" [soloLectura]="true" />
+    }
+  }
+</main>

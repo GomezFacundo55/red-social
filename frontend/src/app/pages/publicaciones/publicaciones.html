@@ -1,1 +1,121 @@
-<p>publicaciones works!</p>
+<main class="container py-4" style="max-width: 760px;">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 mb-0">Publicaciones</h1>
+    <button type="button" class="btn btn-primary" (click)="abrirFormulario()">Nueva publicación</button>
+  </div>
+
+  <div class="btn-group mb-3" role="group" aria-label="Ordenar publicaciones">
+    <button type="button" class="btn btn-sm"
+            [class.btn-primary]="orden() === 'fecha'" [class.btn-outline-primary]="orden() !== 'fecha'"
+            (click)="cambiarOrden('fecha')">Más recientes</button>
+    <button type="button" class="btn btn-sm"
+            [class.btn-primary]="orden() === 'meGusta'" [class.btn-outline-primary]="orden() !== 'meGusta'"
+            (click)="cambiarOrden('meGusta')">Más me gusta</button>
+  </div>
+
+  @if (cargando() && items().length === 0) {
+    <p class="text-body-secondary">Cargando publicaciones...</p>
+  } @else if (items().length === 0) {
+    <div class="text-center text-body-secondary py-5">
+      Todavía no hay publicaciones. Sé la primera persona en publicar.
+    </div>
+  }
+
+  @for (p of items(); track p._id) {
+    <app-publicacion-card
+      [publicacion]="p"
+      [ocupado]="ocupadoId() === p._id"
+      (alternarMeGusta)="alternarMeGusta($event)"
+      (eliminar)="pedirEliminar($event)" />
+  }
+
+  @if (total() > 0) {
+    <nav class="d-flex align-items-center justify-content-between mt-3" aria-label="Paginación">
+      <button type="button" class="btn btn-outline-primary btn-sm"
+              [disabled]="pagina() === 1 || cargando()" (click)="irAPagina(pagina() - 1)">Anterior</button>
+      <span class="text-body-secondary">Página {{ pagina() }} de {{ totalPaginas() }}</span>
+      <button type="button" class="btn btn-outline-primary btn-sm"
+              [disabled]="pagina() >= totalPaginas() || cargando()" (click)="irAPagina(pagina() + 1)">Siguiente</button>
+    </nav>
+  }
+</main>
+
+@if (mostrarFormulario()) {
+  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form [formGroup]="formPost" (ngSubmit)="publicar()" novalidate>
+          <div class="modal-header">
+            <h5 class="modal-title">Nueva publicación</h5>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label" for="post-titulo">Título</label>
+              <input id="post-titulo" type="text" class="form-control" formControlName="titulo"
+                     [class.is-invalid]="formPost.controls.titulo.invalid && formPost.controls.titulo.touched">
+              <div class="invalid-feedback">Ingresá un título de hasta 100 caracteres.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="post-descripcion">Descripción</label>
+              <textarea id="post-descripcion" rows="4" class="form-control" formControlName="descripcion"
+                        [class.is-invalid]="formPost.controls.descripcion.invalid && formPost.controls.descripcion.touched"></textarea>
+              <div class="invalid-feedback">Ingresá una descripción de hasta 1000 caracteres.</div>
+            </div>
+            <div class="mb-1">
+              <label class="form-label" for="post-imagen">Imagen (opcional)</label>
+              <input id="post-imagen" type="file" class="form-control" accept="image/*"
+                     [class.is-invalid]="errorImagen()" (change)="onArchivo($event)">
+              <div class="invalid-feedback">{{ errorImagen() }}</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" [disabled]="enviando()"
+                    (click)="cerrarFormulario()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" [disabled]="enviando()">
+              {{ enviando() ? 'Publicando...' : 'Publicar' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+@if (porEliminar(); as publicacion) {
+  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar publicación</h5>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">¿Querés eliminar «{{ publicacion.titulo }}»? Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" (click)="cancelarEliminar()">Cancelar</button>
+          <button type="button" class="btn btn-danger" (click)="confirmarEliminar()">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalError(); as error) {
+  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ error.titulo }}</h5>
+        </div>
+        <div class="modal-body">
+          @for (mensaje of error.mensajes; track $index) {
+            <p class="mb-1">{{ mensaje }}</p>
+          }
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="cerrarError()">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,51 @@
+<article class="card shadow-sm mb-3">
+  <div class="card-body">
+    <header class="d-flex align-items-center gap-2 mb-3">
+      <img [src]="publicacion().autor.imagenPerfil" alt="" width="40" height="40"
+           class="rounded-circle object-fit-cover">
+      <div class="me-auto">
+        <div class="fw-semibold">{{ publicacion().autor.nombre }} {{ publicacion().autor.apellido }}</div>
+        <small class="text-body-secondary">
+          &#64;{{ publicacion().autor.usuario }} · {{ publicacion().createdAt | date: 'dd/MM/yyyy HH:mm' }}
+        </small>
+      </div>
+      @if (puedeEliminar() && !soloLectura()) {
+        <button type="button" class="btn btn-outline-danger btn-sm" [disabled]="ocupado()"
+                (click)="eliminar.emit(publicacion())">
+          Eliminar
+        </button>
+      }
+    </header>
+
+    <h2 class="h5 card-title">{{ publicacion().titulo }}</h2>
+    <p class="card-text">{{ publicacion().descripcion }}</p>
+
+    @if (publicacion().imagenUrl) {
+      <img [src]="publicacion().imagenUrl" alt="Imagen de la publicación" class="img-fluid rounded mb-3">
+    }
+
+    @if (soloLectura()) {
+      <span class="small text-body-secondary">
+        <i class="bi bi-heart"></i> {{ publicacion().cantidadMeGusta }} me gusta
+      </span>
+    } @else {
+      <button type="button" class="btn btn-sm" [disabled]="ocupado()"
+              [class.btn-primary]="leGusta()" [class.btn-outline-primary]="!leGusta()"
+              (click)="alternarMeGusta.emit(publicacion())">
+        <i class="bi" [class.bi-heart-fill]="leGusta()" [class.bi-heart]="!leGusta()"></i>
+        Me gusta · {{ publicacion().cantidadMeGusta }}
+      </button>
+    }
+
+    <hr>
+    <h3 class="h6">Comentarios ({{ publicacion().comentarios.length }})</h3>
+    @for (comentario of publicacion().comentarios; track $index) {
+      <div class="small mb-2">
+        <strong>{{ nombreAutor(comentario) }}</strong> {{ comentario.texto }}
+        <span class="text-body-secondary"> · {{ comentario.fecha | date: 'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+    } @empty {
+      <p class="small text-body-secondary mb-0">Sin comentarios todavía.</p>
+    }
+  </div>
+</article>
