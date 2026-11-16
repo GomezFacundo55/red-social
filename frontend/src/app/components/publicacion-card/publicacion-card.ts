@@ -3,11 +3,12 @@ import { Component, computed, inject, input, output } from '@angular/core';
 import { Publicacion } from '../../models/publicacion';
 import { AuthService } from '../../services/auth.service';
 import { UrlImagenPipe } from '../../pipes/url-imagen.pipe';
+import { RouterLink } from '@angular/router';
 
 
 @Component({
   selector: 'app-publicacion-card',
-  imports: [DatePipe, UrlImagenPipe],
+  imports: [DatePipe, UrlImagenPipe,RouterLink],
   templateUrl: './publicacion-card.html',
   styleUrl: './publicacion-card.css',
   
@@ -18,6 +19,7 @@ export class PublicacionCard {
   publicacion = input.required<Publicacion>();
   ocupado = input(false);
   soloLectura = input(false);
+  grande = input(false);
 
   alternarMeGusta = output<Publicacion>();
   eliminar = output<Publicacion>();

@@ -1,0 +1,105 @@
+<main class="container py-4" style="max-width: 760px;">
+  <a routerLink="/publicaciones" class="btn btn-link px-0 mb-2">
+    <i class="bi bi-arrow-left"></i> Volver a publicaciones
+  </a>
+
+  @if (cargando()) {
+    <p class="text-body-secondary">Cargando publicación...</p>
+  }
+  @if (errorCarga()) {
+    <div class="alert alert-danger">{{ errorCarga() }}</div>
+  }
+
+  @if (publicacion(); as p) {
+    <app-publicacion-card [publicacion]="p" [grande]="true" [ocupado]="ocupado()"
+                          (alternarMeGusta)="alternarMeGusta($event)" />
+
+    <section class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Comentarios ({{ totalComentarios() }})</h2>
+
+        <form [formGroup]="formComentario" (ngSubmit)="comentar()" novalidate class="mb-4">
+          <textarea rows="2" class="form-control mb-2" formControlName="texto"
+                    placeholder="Escribí un comentario..."
+                    [class.is-invalid]="formComentario.controls.texto.invalid && formComentario.controls.texto.touched"></textarea>
+          @if (formComentario.controls.texto.invalid && formComentario.controls.texto.touched) {
+            <div class="text-danger small mb-2">Escribí un comentario de hasta 500 caracteres.</div>
+          }
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary btn-sm" [disabled]="enviando()">
+              {{ enviando() ? 'Enviando...' : 'Comentar' }}
+            </button>
+          </div>
+        </form>
+
+        @for (c of comentarios(); track c._id) {
+          <div class="d-flex gap-2 mb-3">
+            <img [src]="c.autor.imagenPerfil | urlImagen" alt="" width="36" height="36"
+                 class="rounded-circle object-fit-cover">
+            <div class="flex-grow-1">
+              <div class="small">
+                <strong>{{ c.autor.nombre }} {{ c.autor.apellido }}</strong>
+                <span class="text-body-secondary"> · {{ c.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                @if (c.modificado) {
+                  <span class="text-body-secondary fst-italic"> · editado</span>
+                }
+              </div>
+
+              @if (editandoId() === c._id) {
+                <form [formGroup]="formEdicion" (ngSubmit)="guardarEdicion(c)" novalidate>
+                  <textarea rows="2" class="form-control mb-2" formControlName="texto"
+                            [class.is-invalid]="formEdicion.controls.texto.invalid && formEdicion.controls.texto.touched"></textarea>
+                  <button type="submit" class="btn btn-primary btn-sm me-2" [disabled]="guardandoEdicion()">
+                    {{ guardandoEdicion() ? 'Guardando...' : 'Guardar' }}
+                  </button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm"
+                          (click)="cancelarEdicion()">Cancelar</button>
+                </form>
+              } @else {
+                <div class="text-break">{{ c.texto }}</div>
+                @if (esMio(c)) {
+                  <button type="button" class="btn btn-link btn-sm px-0" (click)="empezarEdicion(c)">Editar</button>
+                }
+              }
+            </div>
+          </div>
+        } @empty {
+          @if (cargandoComentarios()) {
+            <p class="text-body-secondary mb-0">Cargando comentarios...</p>
+          } @else {
+            <p class="text-body-secondary mb-0">Todavía no hay comentarios. Sé la primera persona en comentar.</p>
+          }
+        }
+
+        @if (hayMas()) {
+          <div class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm"
+                    [disabled]="cargandoComentarios()" (click)="cargarComentarios()">
+              {{ cargandoComentarios() ? 'Cargando...' : 'Cargar más comentarios' }}
+            </button>
+          </div>
+        }
+      </div>
+    </section>
+  }
+</main>
+
+@if (modalError(); as error) {
+  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ error.titulo }}</h5>
+        </div>
+        <div class="modal-body">
+          @for (mensaje of error.mensajes; track $index) {
+            <p class="mb-1">{{ mensaje }}</p>
+          }
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="cerrarError()">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

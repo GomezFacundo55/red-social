@@ -18,6 +18,10 @@ export class PublicacionesService {
     return this.http.post<Publicacion>(this.api, datos);
   }
 
+    obtener(id: string) {
+    return this.http.get<Publicacion>(`${this.api}/${id}`);
+  }
+
   eliminar(id: string) {
     return this.http.delete<{ mensaje: string }>(`${this.api}/${id}`);
   }
