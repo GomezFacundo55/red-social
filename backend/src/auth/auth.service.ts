@@ -11,8 +11,11 @@ import { UsersService } from '../users/users.service.js';
 import { RegistroDto } from './dto/registro.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import type { ArchivoSubido } from './archivo-subido.js';
+import type { UsuarioToken } from './jwt-auth.guard.js';
 
 const TIPOS_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+type DatosToken = Pick<UsuarioToken, 'sub' | 'usuario' | 'perfil'>;
 
 @Injectable()
 export class AuthService {
@@ -57,8 +60,13 @@ export class AuthService {
       imagenPerfil,
     });
 
+    const token = await this.firmar({
+      sub: usuario._id.toString(),
+      usuario: usuario.usuario,
+      perfil: usuario.perfil,
+    });
     const { password, ...datos } = usuario.toObject();
-    return datos;
+    return { token, usuario: datos };
   }
 
   async login(dto: LoginDto) {
@@ -71,13 +79,34 @@ export class AuthService {
       throw new UnauthorizedException('Usuario o contraseña incorrectos.');
     }
 
-    const token = await this.jwtService.signAsync({
+    const token = await this.firmar({
       sub: usuario._id.toString(),
       usuario: usuario.usuario,
       perfil: usuario.perfil,
     });
-
     const { password, ...datos } = usuario.toObject();
     return { token, usuario: datos };
+  }
+
+  async autorizar(token: UsuarioToken) {
+    const usuario = await this.usersService.buscarPorId(token.sub);
+    if (!usuario) {
+      throw new UnauthorizedException('El usuario ya no existe.');
+    }
+    const { password, ...datos } = usuario.toObject();
+    return datos;
+  }
+
+  async refrescar(token: UsuarioToken) {
+    const nuevo = await this.firmar({
+      sub: token.sub,
+      usuario: token.usuario,
+      perfil: token.perfil,
+    });
+    return { token: nuevo };
+  }
+
+  private firmar(datos: DatosToken) {
+    return this.jwtService.signAsync(datos);
   }
 }

@@ -80,6 +80,19 @@ export class PostsService {
     return { items, total, offset: desde, limit: cantidad };
   }
 
+    async obtener(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('El id de la publicación no es válido.');
+    }
+    const publicacion = await this.publicacionModel
+      .findOne({ _id: id, eliminada: false })
+      .populate('autor', DATOS_AUTOR);
+    if (!publicacion) {
+      throw new NotFoundException('La publicación no existe.');
+    }
+    return publicacion;
+  }
+
   async eliminar(id: string, usuario: UsuarioToken) {
     const publicacion = await this.obtenerActiva(id);
 

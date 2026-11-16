@@ -16,18 +16,7 @@ export class Publicacion {
   meGusta: Types.ObjectId[];
 
   @Prop({ default: 0 }) cantidadMeGusta: number;
-
-  @Prop({
-    type: [
-      {
-        autor: { type: Types.ObjectId, ref: 'User' },
-        texto: String,
-        fecha: { type: Date, default: Date.now },
-      },
-    ],
-    default: [],
-  })
-  comentarios: { autor: Types.ObjectId; texto: string; fecha: Date }[];
+  @Prop({ default: 0 }) cantidadComentarios: number;
 
   @Prop({ default: false, index: true }) eliminada: boolean;
 }

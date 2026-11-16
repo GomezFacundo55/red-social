@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model,isValidObjectId } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema.js';
 import { Imagen, ImagenDocument } from './schemas/imagen.schema.js';
 
 @Injectable()
 export class UsersService {
+  buscarPorId(id: string) {
+  return isValidObjectId(id) ? this.userModel.findById(id) : null;
+}
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Imagen.name) private imagenModel: Model<ImagenDocument>,

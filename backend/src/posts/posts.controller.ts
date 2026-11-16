@@ -46,6 +46,10 @@ export class PostsController {
   ) {
     return this.postsService.listar(orden, offset, limit, usuario);
   }
+    @Get(':id')
+  obtener(@Param('id') id: string) {
+    return this.postsService.obtener(id);
+  }
 
   @Delete(':id')
   eliminar(@Req() req: PeticionConUsuario, @Param('id') id: string) {
