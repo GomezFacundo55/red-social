@@ -1,7 +1,8 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, input, output } from '@angular/core';
-import { Comentario, Publicacion } from '../../models/publicacion';
+import { Publicacion } from '../../models/publicacion';
 import { AuthService } from '../../services/auth.service';
+
 
 @Component({
   selector: 'app-publicacion-card',
@@ -26,8 +27,4 @@ export class PublicacionCard {
     return !!usuario && (usuario.perfil === 'administrador' || this.publicacion().autor._id === usuario._id);
   });
 
-  nombreAutor(comentario: Comentario): string {
-    const autor = comentario.autor;
-    return typeof autor === 'object' && autor ? `${autor.nombre} ${autor.apellido}` : 'Usuario';
-  }
 }

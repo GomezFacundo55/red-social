@@ -1,0 +1,41 @@
+@if (sesion.modal() === 'por-vencer') {
+  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Tu sesión está por vencer</h5>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">Te quedan 5 minutos de sesión. ¿Querés extenderla?</p>
+          @if (sesion.errorExtender()) {
+            <p class="text-danger small mt-2 mb-0">{{ sesion.errorExtender() }}</p>
+          }
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" [disabled]="sesion.extendiendo()"
+                  (click)="sesion.cerrarSesion()">Cerrar sesión</button>
+          <button type="button" class="btn btn-primary" [disabled]="sesion.extendiendo()"
+                  (click)="sesion.extender()">
+            {{ sesion.extendiendo() ? 'Extendiendo...' : 'Extender sesión' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else if (sesion.modal() === 'vencida') {
+  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Tu sesión venció</h5>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">Iniciá sesión de nuevo para seguir usando la aplicación.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="sesion.aceptarVencida()">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

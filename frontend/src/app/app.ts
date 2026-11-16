@@ -1,13 +1,20 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Cargando } from './components/cargando/cargando';
+import { ModalSesion } from './components/modal-sesion/modal-sesion';
 import { Navbar } from './components/navbar/navbar';
+import { SesionService } from './services/sesion.service';
 
 @Component({
-  imports: [RouterOutlet,Navbar],
   selector: 'app-root',
-  styleUrl: './app.css',
+  imports: [RouterOutlet, Navbar, Cargando, ModalSesion],
   templateUrl: './app.html',
+  styleUrl: './app.css',
 })
 export class App {
-  protected readonly title = signal('frontend');
+  sesion = inject(SesionService);
+
+  constructor() {
+    this.sesion.iniciar();
+  }
 }

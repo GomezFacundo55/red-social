@@ -7,9 +7,20 @@ export interface AutorPublicacion {
 }
 
 export interface Comentario {
-  autor: AutorPublicacion | string;
+  _id: string;
+  publicacion: string;
+  autor: AutorPublicacion;
   texto: string;
-  fecha: string;
+  modificado: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PaginaComentarios {
+  items: Comentario[];
+  total: number;
+  offset: number;
+  limit: number;
 }
 
 export interface Publicacion {
@@ -20,7 +31,7 @@ export interface Publicacion {
   autor: AutorPublicacion;
   meGusta: string[];
   cantidadMeGusta: number;
-  comentarios: Comentario[];
+  cantidadComentarios: number;
   createdAt: string;
 }
 

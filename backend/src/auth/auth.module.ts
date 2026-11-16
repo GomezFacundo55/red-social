@@ -13,7 +13,7 @@ import { UsersModule } from '../users/users.module.js';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow<string>('JWT_SECRET'),
-        signOptions: { expiresIn: 60 * 15 }, // 15 minutos en segundos
+        signOptions: { expiresIn: 60 }, // 
       }),
     }),
   ],

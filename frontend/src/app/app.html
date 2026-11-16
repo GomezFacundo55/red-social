@@ -1,2 +1,7 @@
-<app-navbar />
-<router-outlet />
+@if (sesion.iniciando()) {
+  <app-cargando />
+} @else {
+  <app-navbar />
+  <router-outlet />
+}
+<app-modal-sesion />

@@ -80,14 +80,15 @@ export class Registro {
 
   this.enviando = true;
   this.auth.registro(datos).subscribe({
-    next: () => {
-      this.enviando = false;
-      this.modal = {
-        exito: true,
-        titulo: '¡Cuenta creada!',
-        mensajes: ['Tu registro se completó. Ya podés iniciar sesión.'],
-      };
-    },
+          next: (res) => {
+        this.enviando = false;
+        this.auth.guardarSesion(res.token, res.usuario);
+        this.modal = {
+          exito: true,
+          titulo: '¡Cuenta creada!',
+          mensajes: ['Tu registro se completó y ya iniciaste sesión.'],
+        };
+      },
     error: (err: HttpErrorResponse) => {
       this.enviando = false;
       this.modal = {
@@ -110,6 +111,6 @@ private mensajesDeError(err: HttpErrorResponse): string[] {
 cerrarModal() {
   const exito = this.modal?.exito;
   this.modal = null;
-  if (exito) this.router.navigate(['/login']);
+      if (exito) this.router.navigate(['/publicaciones']);
 }
 }

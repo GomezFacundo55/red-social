@@ -36,16 +36,11 @@
         Me gusta · {{ publicacion().cantidadMeGusta }}
       </button>
     }
+        <hr>
+    <span class="small text-body-secondary">
+      <i class="bi bi-chat"></i> {{ publicacion().cantidadComentarios }} comentarios
+    </span>
 
-    <hr>
-    <h3 class="h6">Comentarios ({{ publicacion().comentarios.length }})</h3>
-    @for (comentario of publicacion().comentarios; track $index) {
-      <div class="small mb-2">
-        <strong>{{ nombreAutor(comentario) }}</strong> {{ comentario.texto }}
-        <span class="text-body-secondary"> · {{ comentario.fecha | date: 'dd/MM/yyyy HH:mm' }}</span>
-      </div>
-    } @empty {
-      <p class="small text-body-secondary mb-0">Sin comentarios todavía.</p>
-    }
+    
   </div>
 </article>
