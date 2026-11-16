@@ -4,10 +4,11 @@ import { PublicacionCard } from '../../components/publicacion-card/publicacion-c
 import { Publicacion } from '../../models/publicacion';
 import { AuthService } from '../../services/auth.service';
 import { PublicacionesService } from '../../services/publicaciones.service';
+import { UrlImagenPipe } from '../../pipes/url-imagen.pipe';
 
 @Component({
   selector: 'app-mi-perfil',
-  imports: [DatePipe, PublicacionCard],
+  imports: [DatePipe, PublicacionCard,UrlImagenPipe],
   templateUrl: './mi-perfil.html',
   styleUrl: './mi-perfil.css',
 })

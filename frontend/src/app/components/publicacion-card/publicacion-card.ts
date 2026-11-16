@@ -2,13 +2,15 @@ import { DatePipe } from '@angular/common';
 import { Component, computed, inject, input, output } from '@angular/core';
 import { Publicacion } from '../../models/publicacion';
 import { AuthService } from '../../services/auth.service';
+import { UrlImagenPipe } from '../../pipes/url-imagen.pipe';
 
 
 @Component({
   selector: 'app-publicacion-card',
-  imports: [DatePipe],
+  imports: [DatePipe, UrlImagenPipe],
   templateUrl: './publicacion-card.html',
   styleUrl: './publicacion-card.css',
+  
 })
 export class PublicacionCard {
   private auth = inject(AuthService);

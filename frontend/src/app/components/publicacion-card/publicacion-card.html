@@ -1,7 +1,7 @@
 <article class="card shadow-sm mb-3">
   <div class="card-body">
     <header class="d-flex align-items-center gap-2 mb-3">
-      <img [src]="publicacion().autor.imagenPerfil" alt="" width="40" height="40"
+      <img [src]="publicacion().autor.imagenPerfil |  urlImagen" alt="" width="40" height="40"
            class="rounded-circle object-fit-cover">
       <div class="me-auto">
         <div class="fw-semibold">{{ publicacion().autor.nombre }} {{ publicacion().autor.apellido }}</div>
@@ -21,7 +21,7 @@
     <p class="card-text">{{ publicacion().descripcion }}</p>
 
     @if (publicacion().imagenUrl) {
-      <img [src]="publicacion().imagenUrl" alt="Imagen de la publicación" class="img-fluid rounded mb-3">
+      <img [src]="publicacion().imagenUrl |  urlImagen" alt="Imagen de la publicación" class="img-fluid rounded mb-3">
     }
 
     @if (soloLectura()) {

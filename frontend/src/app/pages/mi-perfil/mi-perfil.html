@@ -3,7 +3,7 @@
     <section class="card shadow-sm mb-4">
       <div class="card-body">
         <div class="d-flex flex-column flex-sm-row align-items-center gap-3 mb-3">
-          <img [src]="u.imagenPerfil" alt="Foto de perfil" width="120" height="120"
+          <img [src]="u.imagenPerfil | urlImagen" alt="Foto de perfil" width="120" height="120"
                class="rounded-circle object-fit-cover border">
           <div class="text-center text-sm-start">
             <h1 class="h3 mb-1">{{ u.nombre }} {{ u.apellido }}</h1>
