@@ -14,6 +14,7 @@ export class User {
   @Prop({ required: true, maxlength: 200 }) descripcion: string;
   @Prop({ required: true }) imagenPerfil: string;
   @Prop({ enum: ['usuario', 'administrador'], default: 'usuario' }) perfil: string;
+  @Prop({ default: true }) habilitado: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

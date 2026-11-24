@@ -1,0 +1,63 @@
+<main class="container py-4 stats-page">
+  <header class="mb-4">
+    <p class="text-uppercase text-primary fw-semibold small mb-1">Administración</p>
+    <h1 class="h2 mb-1">Estadísticas</h1>
+    <p class="text-body-secondary mb-0">Actividad de la comunidad dentro del período seleccionado.</p>
+  </header>
+
+  <form class="card card-body shadow-sm mb-4 stats-filter" [formGroup]="rango"
+        (ngSubmit)="consultar()">
+    <div class="row align-items-end g-3">
+      <div class="col-sm-5 col-lg-4">
+        <label for="stats-desde" class="form-label">Desde</label>
+        <input id="stats-desde" type="date" class="form-control" formControlName="desde">
+      </div>
+      <div class="col-sm-5 col-lg-4">
+        <label for="stats-hasta" class="form-label">Hasta</label>
+        <input id="stats-hasta" type="date" class="form-control" formControlName="hasta">
+      </div>
+      <div class="col-sm-2">
+        <button class="btn btn-primary w-100" type="submit" [disabled]="cargando()">
+          {{ cargando() ? 'Cargando...' : 'Aplicar' }}
+        </button>
+      </div>
+    </div>
+  </form>
+
+  @if (error()) {
+    <div class="alert alert-danger" role="alert">{{ error() }}</div>
+  }
+
+  <div class="row g-4">
+    <div class="col-12">
+      <section class="card shadow-sm h-100">
+        <div class="card-body">
+          <h2 class="h5">Publicaciones por usuario</h2>
+          <p class="small text-body-secondary">Cantidad de publicaciones no dadas de baja.</p>
+          <app-estadistica-grafico titulo="Publicaciones por usuario"
+                                  tipo="barras" [puntos]="publicaciones()" />
+        </div>
+      </section>
+    </div>
+    <div class="col-12">
+      <section class="card shadow-sm h-100">
+        <div class="card-body">
+          <h2 class="h5">Comentarios a lo largo del tiempo</h2>
+          <p class="small text-body-secondary">Evolución diaria, solo en publicaciones activas.</p>
+          <app-estadistica-grafico titulo="Comentarios por fecha"
+                                  tipo="linea" [puntos]="comentariosPorDia()" />
+        </div>
+      </section>
+    </div>
+    <div class="col-12">
+      <section class="card shadow-sm h-100">
+        <div class="card-body">
+          <h2 class="h5">Comentarios por publicación</h2>
+          <p class="small text-body-secondary">Distribución de comentarios dentro del período.</p>
+          <app-estadistica-grafico titulo="Comentarios por publicación"
+                                  tipo="dona" [puntos]="comentariosPorPublicacion()" />
+        </div>
+      </section>
+    </div>
+  </div>
+</main>

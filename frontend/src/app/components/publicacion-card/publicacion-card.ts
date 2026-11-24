@@ -24,7 +24,10 @@ export class PublicacionCard {
   alternarMeGusta = output<Publicacion>();
   eliminar = output<Publicacion>();
 
-  leGusta = computed(() => this.publicacion().meGusta.includes(this.auth.usuarioActual()?._id));
+  leGusta = computed(() => {
+    const usuarioId = this.auth.usuarioActual()?._id;
+    return usuarioId ? this.publicacion().meGusta.includes(usuarioId) : false;
+  });
 
   puedeEliminar = computed(() => {
     const usuario = this.auth.usuarioActual();

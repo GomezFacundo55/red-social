@@ -1,16 +1,11 @@
 import { Component, inject } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router,RouterLink } from '@angular/router';
 import { passwordFuerte } from '../../validators/password.validators';
 import { passwordsCoinciden } from '../../validators/coincidir.validators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
-
-
-function fechaNoFutura(control: AbstractControl): ValidationErrors | null {
-  if (!control.value) return null;
-  return new Date(control.value) > new Date() ? { fechaFutura: true } : null;
-}
+import { fechaNoFutura } from '../../validators/fecha.validators';
 
 @Component({
   selector: 'app-registro',

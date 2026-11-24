@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PublicacionCard } from '../../components/publicacion-card/publicacion-card';
 import { Comentario, Publicacion } from '../../models/publicacion';
 import { UrlImagenPipe } from '../../pipes/url-imagen.pipe';
@@ -20,6 +20,7 @@ const POR_CARGA = 5;
 })
 export class PublicacionDetalle {
   private ruta = inject(ActivatedRoute);
+  private router = inject(Router);
   private publicaciones = inject(PublicacionesService);
   private comentariosApi = inject(ComentariosService);
   private auth = inject(AuthService);
@@ -39,6 +40,7 @@ export class PublicacionDetalle {
   editandoId = signal<string | null>(null);
   guardandoEdicion = signal(false);
   modalError = signal<{ titulo: string; mensajes: string[] } | null>(null);
+  porEliminar = signal<Publicacion | null>(null);
 
   hayMas = computed(() => this.comentarios().length < this.totalComentarios());
 
@@ -91,7 +93,8 @@ export class PublicacionDetalle {
   }
 
   alternarMeGusta(publicacion: Publicacion) {
-    const yaLeGusta = publicacion.meGusta.includes(this.auth.usuarioActual()?._id);
+    const usuarioId = this.auth.usuarioActual()?._id;
+    const yaLeGusta = usuarioId ? publicacion.meGusta.includes(usuarioId) : false;
     const peticion = yaLeGusta
       ? this.publicaciones.quitarMeGusta(publicacion._id)
       : this.publicaciones.darMeGusta(publicacion._id);
@@ -105,6 +108,28 @@ export class PublicacionDetalle {
       error: (err) => {
         this.ocupado.set(false);
         this.mostrarError('No se pudo actualizar el me gusta', err);
+      },
+    });
+  }
+
+  pedirEliminar(publicacion: Publicacion) {
+    this.porEliminar.set(publicacion);
+  }
+
+  cancelarEliminar() {
+    this.porEliminar.set(null);
+  }
+
+  confirmarEliminar() {
+    const publicacion = this.porEliminar();
+    if (!publicacion) return;
+    this.ocupado.set(true);
+    this.publicaciones.eliminar(publicacion._id).subscribe({
+      next: () => this.router.navigate(['/publicaciones']),
+      error: (err) => {
+        this.ocupado.set(false);
+        this.porEliminar.set(null);
+        this.mostrarError('No se pudo eliminar la publicación', err);
       },
     });
   }

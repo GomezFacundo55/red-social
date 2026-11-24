@@ -1,10 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { SoloAdminDirective } from '../../directives/solo-admin.directive';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, SoloAdminDirective],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })

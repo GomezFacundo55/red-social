@@ -4,6 +4,8 @@ import { UsersController } from './users.controller.js';
 import { UsersService } from './users.service.js';
 import { User, UserSchema } from './schemas/user.schema.js';
 import { Imagen, ImagenSchema } from './schemas/imagen.schema.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { AdminGuard } from '../auth/admin.guard.js';
 
 @Module({
   imports: [
@@ -13,7 +15,7 @@ import { Imagen, ImagenSchema } from './schemas/imagen.schema.js';
     ]),
   ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, JwtAuthGuard, AdminGuard],
   exports: [UsersService],
 })
 export class UsersModule {}

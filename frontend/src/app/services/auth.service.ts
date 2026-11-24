@@ -8,8 +8,22 @@ const CLAVE_RECIBIDO = 'tokenRecibido';
 
 interface Sesion {
   token: string;
-  usuario: any;
+  usuario: UsuarioSesion;
   recibidoEn: number;
+}
+
+export interface UsuarioSesion {
+  _id: string;
+  nombre: string;
+  apellido: string;
+  correo: string;
+  usuario: string;
+  perfil: 'usuario' | 'administrador';
+  habilitado: boolean;
+  imagenPerfil: string;
+  descripcion: string;
+  fechaNacimiento: string;
+  createdAt: string;
 }
 
 // Cuánto dura un token (exp - iat), leído de su contenido
@@ -49,11 +63,11 @@ export class AuthService {
   }
 
   registro(datos: FormData) {
-    return this.http.post<{ token: string; usuario: unknown }>(`${this.api}/auth/registro`, datos);
+    return this.http.post<{ token: string; usuario: UsuarioSesion }>(`${this.api}/auth/registro`, datos);
   }
 
   login(datos: { usuario: string; password: string }) {
-    return this.http.post<{ token: string; usuario: unknown }>(`${this.api}/auth/login`, datos);
+    return this.http.post<{ token: string; usuario: UsuarioSesion }>(`${this.api}/auth/login`, datos);
   }
 
   autorizar() {
@@ -64,7 +78,7 @@ export class AuthService {
     return this.http.post<{ token: string }>(`${this.api}/auth/refrescar`, {});
   }
 
-  guardarSesion(token: string, usuario: unknown) {
+  guardarSesion(token: string, usuario: UsuarioSesion) {
     this.persistir(token, usuario, Date.now());
   }
 
@@ -73,7 +87,7 @@ export class AuthService {
     if (sesion) this.persistir(token, sesion.usuario, Date.now());
   }
 
-  actualizarUsuario(usuario: unknown) {
+  actualizarUsuario(usuario: UsuarioSesion) {
     const sesion = this.sesion();
     if (sesion) this.persistir(sesion.token, usuario, sesion.recibidoEn);
   }
@@ -85,7 +99,7 @@ export class AuthService {
     this.sesion.set(null);
   }
 
-  private persistir(token: string, usuario: unknown, recibidoEn: number) {
+  private persistir(token: string, usuario: UsuarioSesion, recibidoEn: number) {
     localStorage.setItem(CLAVE_TOKEN, token);
     localStorage.setItem(CLAVE_USUARIO, JSON.stringify(usuario));
     localStorage.setItem(CLAVE_RECIBIDO, String(recibidoEn));
@@ -98,7 +112,7 @@ export class AuthService {
       const usuario = localStorage.getItem(CLAVE_USUARIO);
       if (!token || !usuario) return null;
       const recibido = Number(localStorage.getItem(CLAVE_RECIBIDO)) || Date.now();
-      return { token, usuario: JSON.parse(usuario), recibidoEn: recibido };
+      return { token, usuario: JSON.parse(usuario) as UsuarioSesion, recibidoEn: recibido };
     } catch {
       return null;
     }

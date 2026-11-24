@@ -12,7 +12,8 @@
 
   @if (publicacion(); as p) {
     <app-publicacion-card [publicacion]="p" [grande]="true" [ocupado]="ocupado()"
-                          (alternarMeGusta)="alternarMeGusta($event)" />
+                          (alternarMeGusta)="alternarMeGusta($event)"
+                          (eliminar)="pedirEliminar($event)" />
 
     <section class="card shadow-sm">
       <div class="card-body">
@@ -83,6 +84,29 @@
     </section>
   }
 </main>
+
+@if (porEliminar(); as publicacion) {
+  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title h5">Eliminar publicación</h2>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">¿Querés dar de baja «{{ publicacion.titulo }}»? Sus comentarios dejarán de estar disponibles.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" [disabled]="ocupado()"
+                  (click)="cancelarEliminar()">Cancelar</button>
+          <button type="button" class="btn btn-danger" [disabled]="ocupado()"
+                  (click)="confirmarEliminar()">
+            {{ ocupado() ? 'Eliminando...' : 'Dar de baja' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
 
 @if (modalError(); as error) {
   <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">

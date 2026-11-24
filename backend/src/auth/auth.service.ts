@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service.js';
@@ -13,52 +7,17 @@ import { LoginDto } from './dto/login.dto.js';
 import type { ArchivoSubido } from './archivo-subido.js';
 import type { UsuarioToken } from './jwt-auth.guard.js';
 
-const TIPOS_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-
 type DatosToken = Pick<UsuarioToken, 'sub' | 'usuario' | 'perfil'>;
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private config: ConfigService,
     private jwtService: JwtService,
   ) {}
 
   async registro(dto: RegistroDto, imagen?: ArchivoSubido) {
-    if (dto.password !== dto.repetirPassword) {
-      throw new BadRequestException('Las contraseñas no coinciden.');
-    }
-    if (!imagen) {
-      throw new BadRequestException('La imagen de perfil es obligatoria.');
-    }
-    if (!TIPOS_PERMITIDOS.includes(imagen.mimetype)) {
-      throw new BadRequestException('La imagen debe ser JPG, PNG, WEBP o GIF.');
-    }
-    if (await this.usersService.buscarPorCorreo(dto.correo)) {
-      throw new ConflictException('Ya existe un usuario con ese correo.');
-    }
-    if (await this.usersService.buscarPorUsuario(dto.usuario)) {
-      throw new ConflictException('Ese nombre de usuario ya está en uso.');
-    }
-
-    // Guardar la imagen en la base y armar su URL
-    const imagenId = await this.usersService.guardarImagen(imagen.mimetype, imagen.buffer);
-    const baseUrl = this.config.get<string>('BASE_URL') ?? 'http://localhost:3000';
-    const imagenPerfil = `${baseUrl}/users/imagen/${imagenId}`;
-
-    // Encriptar la contraseña y crear el usuario
-    const passwordHash = await bcrypt.hash(dto.password, 10);
-    const usuario = await this.usersService.crear({
-      nombre: dto.nombre,
-      apellido: dto.apellido,
-      correo: dto.correo,
-      usuario: dto.usuario,
-      password: passwordHash,
-      fechaNacimiento: new Date(dto.fechaNacimiento),
-      descripcion: dto.descripcion,
-      imagenPerfil,
-    });
+    const usuario = await this.usersService.crearUsuario(dto, imagen, 'usuario');
 
     const token = await this.firmar({
       sub: usuario._id.toString(),
@@ -78,6 +37,11 @@ export class AuthService {
     if (!usuario || !passwordOk) {
       throw new UnauthorizedException('Usuario o contraseña incorrectos.');
     }
+    if (usuario.habilitado === false) {
+      throw new UnauthorizedException(
+        'Tu cuenta está deshabilitada. Contactá a un administrador.',
+      );
+    }
 
     const token = await this.firmar({
       sub: usuario._id.toString(),
@@ -89,21 +53,30 @@ export class AuthService {
   }
 
   async autorizar(token: UsuarioToken) {
-    const usuario = await this.usersService.buscarPorId(token.sub);
-    if (!usuario) {
-      throw new UnauthorizedException('El usuario ya no existe.');
-    }
+    const usuario = await this.usuarioActivo(token.sub);
     const { password, ...datos } = usuario.toObject();
     return datos;
   }
 
   async refrescar(token: UsuarioToken) {
+    await this.usuarioActivo(token.sub);
     const nuevo = await this.firmar({
       sub: token.sub,
       usuario: token.usuario,
       perfil: token.perfil,
     });
     return { token: nuevo };
+  }
+
+  private async usuarioActivo(id: string) {
+    const usuario = await this.usersService.buscarPorId(id);
+    if (!usuario) {
+      throw new UnauthorizedException('El usuario ya no existe.');
+    }
+    if (usuario.habilitado === false) {
+      throw new UnauthorizedException('Tu cuenta está deshabilitada.');
+    }
+    return usuario;
   }
 
   private firmar(datos: DatosToken) {

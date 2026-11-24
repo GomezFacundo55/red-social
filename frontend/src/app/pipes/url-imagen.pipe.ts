@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { environment } from '../../environments/environment';
 
-@Pipe({ name: 'urlImagen' })
+@Pipe({ name: 'urlImagen', standalone: true })
 export class UrlImagenPipe implements PipeTransform {
   private api = environment.apiUrl.replace(/\/+$/, '');
 

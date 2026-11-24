@@ -9,7 +9,7 @@
           &#64;{{ publicacion().autor.usuario }} · {{ publicacion().createdAt | date: 'dd/MM/yyyy HH:mm' }}
         </small>
       </div>
-      @if (puedeEliminar() && !soloLectura() && !grande()) {
+      @if (puedeEliminar() && !soloLectura()) {
         <button type="button" class="btn btn-outline-danger btn-sm" [disabled]="ocupado()"
                 (click)="eliminar.emit(publicacion())">
           Eliminar

@@ -1,0 +1,19 @@
+{
+  "name": "Red-Social",
+  "short_name": "Red-Social",
+  "description": "Compartí publicaciones y conectate con tu comunidad.",
+  "lang": "es",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f6fb",
+  "theme_color": "#5661d8",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

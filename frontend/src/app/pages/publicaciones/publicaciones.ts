@@ -80,7 +80,8 @@ export class Publicaciones {
   }
 
   alternarMeGusta(publicacion: Publicacion) {
-    const yaLeGusta = publicacion.meGusta.includes(this.auth.usuarioActual()?._id);
+    const usuarioId = this.auth.usuarioActual()?._id;
+    const yaLeGusta = usuarioId ? publicacion.meGusta.includes(usuarioId) : false;
     const peticion = yaLeGusta
       ? this.servicio.quitarMeGusta(publicacion._id)
       : this.servicio.darMeGusta(publicacion._id);

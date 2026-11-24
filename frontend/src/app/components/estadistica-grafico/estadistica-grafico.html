@@ -1,0 +1,56 @@
+<section class="chart-shell" [attr.aria-label]="titulo()" role="img">
+  @if (puntos().length === 0 || total() === 0) {
+    <div class="chart-empty">Sin datos para el período seleccionado.</div>
+  } @else {
+    @if (tipo() === 'barras') {
+      <div class="bar-chart">
+        @for (punto of puntos(); track $index; let i = $index) {
+          <div class="bar-row">
+            <span class="bar-label" [title]="punto.etiqueta">{{ punto.etiqueta }}</span>
+            <div class="bar-track">
+              <span class="bar-fill" [style.width.%]="anchoBarra(punto.cantidad)"
+                    [style.background]="color(i)"></span>
+            </div>
+            <strong class="bar-value">{{ punto.cantidad | numeroCompacto }}</strong>
+          </div>
+        }
+      </div>
+    } @else if (tipo() === 'linea') {
+      <div class="line-chart">
+        <svg viewBox="0 0 600 240" preserveAspectRatio="none" aria-hidden="true">
+          <line x1="32" y1="35" x2="568" y2="35" class="chart-grid"></line>
+          <line x1="32" y1="120" x2="568" y2="120" class="chart-grid"></line>
+          <line x1="32" y1="205" x2="568" y2="205" class="chart-grid"></line>
+          <polyline [attr.points]="coordenadasLinea()" class="line-path"></polyline>
+          @for (punto of puntos(); track $index; let i = $index) {
+            <circle [attr.cx]="32 + (puntos().length < 2 ? 268 : i / (puntos().length - 1) * 536)"
+                    [attr.cy]="205 - (punto.cantidad / maximo()) * 170" r="3" class="line-point"></circle>
+          }
+          @for (punto of etiquetasLinea(); track punto.etiqueta) {
+            <text [attr.x]="punto.x" y="232" text-anchor="middle" class="line-label">
+              {{ punto.etiqueta }}
+            </text>
+          }
+        </svg>
+      </div>
+    } @else {
+      <div class="donut-layout">
+        <div class="donut" [style.background]="fondoDona()">
+          <div class="donut-center">
+            <strong>{{ total() | numeroCompacto }}</strong>
+            <span>comentarios</span>
+          </div>
+        </div>
+        <ul class="donut-legend">
+          @for (punto of puntos(); track $index; let i = $index) {
+            <li>
+              <span class="legend-dot" [style.background]="color(i)"></span>
+              <span class="legend-label" [title]="punto.etiqueta">{{ punto.etiqueta }}</span>
+              <strong>{{ punto.cantidad | numeroCompacto }}</strong>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  }
+</section>

@@ -12,6 +12,12 @@
       <li class="nav-item">
         <a class="nav-link" routerLink="/mi-perfil" routerLinkActive="active">Mi perfil</a>
       </li>
+      <li class="nav-item" *appSoloAdmin>
+        <a class="nav-link" routerLink="/dashboard/usuarios" routerLinkActive="active">Usuarios</a>
+      </li>
+      <li class="nav-item" *appSoloAdmin>
+        <a class="nav-link" routerLink="/dashboard/estadisticas" routerLinkActive="active">Estadísticas</a>
+      </li>
     </ul>
 
     <button type="button" class="btn btn-outline-primary btn-sm" (click)="cerrarSesion()">

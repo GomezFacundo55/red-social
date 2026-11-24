@@ -1,0 +1,24 @@
+.admin-page {
+  max-width: 1180px;
+}
+
+.admin-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+.avatar-fallback {
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: #5263d9;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.table th {
+  white-space: nowrap;
+}
