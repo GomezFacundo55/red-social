@@ -75,6 +75,7 @@
 
 .stats-filter .btn {
   min-height: 43px;
+  min-width: 140px;
   white-space: nowrap;
 }
 

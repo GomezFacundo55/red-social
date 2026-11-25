@@ -6,7 +6,6 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, isValidObjectId } from 'mongoose';
 import { UsersService } from '../users/users.service.js';
@@ -26,7 +25,6 @@ export class PostsService {
   constructor(
     @InjectModel(Publicacion.name) private publicacionModel: Model<PublicacionDocument>,
     private usersService: UsersService,
-    private config: ConfigService,
     private activityService: ActivityService,
   ) {}
 
@@ -38,8 +36,7 @@ export class PostsService {
         throw new BadRequestException('La imagen debe ser JPG, PNG, WEBP o GIF.');
       }
       const imagenId = await this.usersService.guardarImagen(imagen.mimetype, imagen.buffer);
-      const baseUrl = this.config.get<string>('BASE_URL') ?? 'http://localhost:3000';
-      imagenUrl = `${baseUrl}/users/imagen/${imagenId}`;
+      imagenUrl = `/users/imagen/${imagenId}`;
     }
 
     const publicacion = await this.publicacionModel.create({

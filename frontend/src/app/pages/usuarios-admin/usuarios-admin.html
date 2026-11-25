@@ -113,96 +113,120 @@
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable"
          role="dialog" aria-modal="true" aria-labelledby="admin-user-title"
          (click)="$event.stopPropagation()">
-      <div class="modal-content">
+      <div class="modal-content admin-user-dialog">
         <form [formGroup]="form" (ngSubmit)="crear()" novalidate>
-          <div class="modal-header">
+          <div class="modal-header admin-user-dialog__header">
+            <span class="admin-user-dialog__mark"><i class="bi bi-person-plus-fill"></i></span>
             <div>
-              <p class="text-uppercase text-primary fw-semibold small mb-1">Alta de cuenta</p>
-              <h2 id="admin-user-title" class="modal-title h5">Nuevo usuario</h2>
+              <p class="admin-user-dialog__eyebrow">ALTA DE CUENTA</p>
+              <h2 id="admin-user-title" class="modal-title">Crear un nuevo usuario</h2>
+              <p class="admin-user-dialog__subtitle">Completá los datos para sumar a alguien a la comunidad.</p>
             </div>
             <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarFormulario()"></button>
           </div>
-          <div class="modal-body">
+          <div class="modal-body admin-user-dialog__body">
             @if (error()) {
-              <div class="alert alert-danger">{{ error() }}</div>
+              <div class="alert alert-danger" role="alert">{{ error() }}</div>
             }
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label" for="admin-nombre">Nombre</label>
-                <input id="admin-nombre" appAutofoco class="form-control" formControlName="nombre"
-                       [class.is-invalid]="f.nombre.invalid && f.nombre.touched">
-                @if (f.nombre.invalid && f.nombre.touched) {
-                  <div class="invalid-feedback">El nombre es obligatorio.</div>
-                }
+            <section class="admin-form-section">
+              <header class="admin-form-section__heading">
+                <span>01</span>
+                <div><h3>Datos personales</h3><p>Información básica y de contacto.</p></div>
+              </header>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label" for="admin-nombre">Nombre</label>
+                  <input id="admin-nombre" appAutofoco class="form-control" formControlName="nombre"
+                         [class.is-invalid]="f.nombre.invalid && f.nombre.touched">
+                  @if (f.nombre.invalid && f.nombre.touched) {
+                    <div class="invalid-feedback">El nombre es obligatorio.</div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="admin-apellido">Apellido</label>
+                  <input id="admin-apellido" class="form-control" formControlName="apellido"
+                         [class.is-invalid]="f.apellido.invalid && f.apellido.touched">
+                  @if (f.apellido.invalid && f.apellido.touched) {
+                    <div class="invalid-feedback">El apellido es obligatorio.</div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="admin-correo">Correo</label>
+                  <input id="admin-correo" type="email" class="form-control" formControlName="correo"
+                         [class.is-invalid]="f.correo.invalid && f.correo.touched">
+                  @if (f.correo.invalid && f.correo.touched) {
+                    <div class="invalid-feedback">Ingresá un correo válido.</div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="admin-usuario">Nombre de usuario</label>
+                  <input id="admin-usuario" class="form-control" formControlName="usuario"
+                         [class.is-invalid]="f.usuario.invalid && f.usuario.touched">
+                  @if (f.usuario.invalid && f.usuario.touched) {
+                    <div class="invalid-feedback">Ingresá al menos 3 caracteres.</div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="admin-fecha">Fecha de nacimiento</label>
+                  <input id="admin-fecha" type="date" class="form-control" formControlName="fechaNacimiento"
+                         [class.is-invalid]="f.fechaNacimiento.invalid && f.fechaNacimiento.touched">
+                  @if (f.fechaNacimiento.invalid && f.fechaNacimiento.touched) {
+                    <div class="invalid-feedback">Ingresá una fecha válida que no sea futura.</div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="admin-imagen">Imagen de perfil</label>
+                  <input id="admin-imagen" type="file" class="form-control" accept="image/*"
+                         (change)="onArchivo($event)" [class.is-invalid]="errorImagen()">
+                  <div class="form-text">JPG, PNG, WEBP o GIF. Hasta 2 MB.</div>
+                  @if (errorImagen()) {
+                    <div class="invalid-feedback d-block">{{ errorImagen() }}</div>
+                  }
+                </div>
+                <div class="col-12">
+                  <label class="form-label" for="admin-descripcion">Descripción breve</label>
+                  <textarea id="admin-descripcion" rows="3" class="form-control"
+                            formControlName="descripcion"
+                            [class.is-invalid]="f.descripcion.invalid && f.descripcion.touched"></textarea>
+                  @if (f.descripcion.invalid && f.descripcion.touched) {
+                    <div class="invalid-feedback">La descripción es obligatoria (máximo 200 caracteres).</div>
+                  }
+                </div>
               </div>
-              <div class="col-md-6">
-                <label class="form-label" for="admin-apellido">Apellido</label>
-                <input id="admin-apellido" class="form-control" formControlName="apellido"
-                       [class.is-invalid]="f.apellido.invalid && f.apellido.touched">
-                @if (f.apellido.invalid && f.apellido.touched) {
-                  <div class="invalid-feedback">El apellido es obligatorio.</div>
-                }
+            </section>
+
+            <section class="admin-form-section">
+              <header class="admin-form-section__heading">
+                <span>02</span>
+                <div><h3>Seguridad de la cuenta</h3><p>Elegí una contraseña segura para el acceso.</p></div>
+              </header>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label" for="admin-password">Contraseña</label>
+                  <input id="admin-password" type="password" class="form-control" formControlName="password"
+                         [class.is-invalid]="f.password.invalid && f.password.touched">
+                  @if (f.password.invalid && f.password.touched) {
+                    <div class="invalid-feedback">Mínimo 8 caracteres, una mayúscula y un número.</div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="admin-repetir-password">Repetir contraseña</label>
+                  <input id="admin-repetir-password" type="password" class="form-control"
+                         formControlName="repetirPassword"
+                         [class.is-invalid]="f.repetirPassword.invalid && f.repetirPassword.touched">
+                  @if (f.repetirPassword.touched &&
+                      (f.repetirPassword.invalid || form.errors?.['noCoinciden'])) {
+                    <div class="invalid-feedback d-block">Las contraseñas deben coincidir.</div>
+                  }
+                </div>
               </div>
-              <div class="col-12">
-                <label class="form-label" for="admin-correo">Correo</label>
-                <input id="admin-correo" type="email" class="form-control" formControlName="correo"
-                       [class.is-invalid]="f.correo.invalid && f.correo.touched">
-                @if (f.correo.invalid && f.correo.touched) {
-                  <div class="invalid-feedback">Ingresá un correo válido.</div>
-                }
-              </div>
-              <div class="col-12">
-                <label class="form-label" for="admin-usuario">Nombre de usuario</label>
-                <input id="admin-usuario" class="form-control" formControlName="usuario"
-                       [class.is-invalid]="f.usuario.invalid && f.usuario.touched">
-                @if (f.usuario.invalid && f.usuario.touched) {
-                  <div class="invalid-feedback">Ingresá al menos 3 caracteres.</div>
-                }
-              </div>
-              <div class="col-md-6">
-                <label class="form-label" for="admin-password">Contraseña</label>
-                <input id="admin-password" type="password" class="form-control" formControlName="password"
-                       [class.is-invalid]="f.password.invalid && f.password.touched">
-                @if (f.password.invalid && f.password.touched) {
-                  <div class="invalid-feedback">Mínimo 8 caracteres, una mayúscula y un número.</div>
-                }
-              </div>
-              <div class="col-md-6">
-                <label class="form-label" for="admin-repetir-password">Repetir contraseña</label>
-                <input id="admin-repetir-password" type="password" class="form-control"
-                       formControlName="repetirPassword"
-                       [class.is-invalid]="f.repetirPassword.invalid && f.repetirPassword.touched">
-                @if (f.repetirPassword.touched &&
-                    (f.repetirPassword.invalid || form.errors?.['noCoinciden'])) {
-                  <div class="invalid-feedback d-block">Las contraseñas deben coincidir.</div>
-                }
-              </div>
-              <div class="col-md-6">
-                <label class="form-label" for="admin-fecha">Fecha de nacimiento</label>
-                <input id="admin-fecha" type="date" class="form-control" formControlName="fechaNacimiento"
-                       [class.is-invalid]="f.fechaNacimiento.invalid && f.fechaNacimiento.touched">
-                @if (f.fechaNacimiento.invalid && f.fechaNacimiento.touched) {
-                  <div class="invalid-feedback">Ingresá una fecha válida que no sea futura.</div>
-                }
-              </div>
-              <div class="col-md-6">
-                <label class="form-label" for="admin-imagen">Imagen de perfil</label>
-                <input id="admin-imagen" type="file" class="form-control" accept="image/*"
-                       (change)="onArchivo($event)" [class.is-invalid]="errorImagen()">
-                @if (errorImagen()) {
-                  <div class="invalid-feedback">{{ errorImagen() }}</div>
-                }
-              </div>
-              <div class="col-12">
-                <label class="form-label" for="admin-descripcion">Descripción breve</label>
-                <textarea id="admin-descripcion" rows="3" class="form-control" formControlName="descripcion"
-                          [class.is-invalid]="f.descripcion.invalid && f.descripcion.touched"></textarea>
-                @if (f.descripcion.invalid && f.descripcion.touched) {
-                  <div class="invalid-feedback">La descripción es obligatoria (máximo 200 caracteres).</div>
-                }
-              </div>
-              <fieldset class="col-12">
-                <legend class="form-label">Perfil</legend>
+            </section>
+
+            <fieldset class="admin-form-section admin-role-section">
+              <legend class="admin-form-section__heading">
+                <span>03</span>
+                <span><strong>Tipo de perfil</strong><small>Definí los permisos de esta cuenta.</small></span>
+              </legend>
                 <div class="role-options">
                   <label class="role-option" [class.role-option--selected]="f.perfil.value === 'usuario'">
                     <input type="radio" formControlName="perfil" value="usuario">
@@ -218,8 +242,7 @@
                     <i class="bi bi-check-circle-fill role-option__check"></i>
                   </label>
                 </div>
-              </fieldset>
-            </div>
+            </fieldset>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary" [disabled]="enviando()"

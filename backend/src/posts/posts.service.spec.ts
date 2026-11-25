@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
-import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import { Publicacion } from './schemas/publicacion.schema.js';
 import { PostsService } from './posts.service.js';
@@ -25,7 +24,6 @@ describe('PostsService', () => {
         PostsService,
         { provide: getModelToken(Publicacion.name), useValue: { findOne, findOneAndUpdate } },
         { provide: UsersService, useValue: {} },
-        { provide: ConfigService, useValue: {} },
         { provide: ActivityService, useValue: { registrarMeGusta } },
       ],
     }).compile();

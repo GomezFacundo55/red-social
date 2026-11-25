@@ -4,7 +4,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import bcrypt from 'bcrypt';
 import { Model, isValidObjectId } from 'mongoose';
@@ -20,7 +19,6 @@ export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Imagen.name) private imagenModel: Model<ImagenDocument>,
-    private config: ConfigService,
   ) {}
 
   crear(datos: Partial<User>) {
@@ -46,8 +44,7 @@ export class UsersService {
     }
 
     const imagenId = await this.guardarImagen(imagen.mimetype, imagen.buffer);
-    const baseUrl = this.config.get<string>('BASE_URL') ?? 'http://localhost:3000';
-    const imagenPerfil = `${baseUrl}/users/imagen/${imagenId}`;
+    const imagenPerfil = `/users/imagen/${imagenId}`;
     const passwordHash = await bcrypt.hash(dto.password, 10);
 
     return this.crear({

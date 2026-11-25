@@ -7,7 +7,7 @@ export class UrlImagenPipe implements PipeTransform {
 
   transform(url: string | null | undefined): string {
     if (!url) return '';
-    const coincidencia = url.match(/\/users\/imagen\/([a-f\d]{24})\/?$/i);
+    const coincidencia = url.match(/\/users\/imagen\/([a-f\d]{24})\/?(?:[?#].*)?$/i);
     return coincidencia ? `${this.api}/users/imagen/${coincidencia[1]}` : url;
   }
 }

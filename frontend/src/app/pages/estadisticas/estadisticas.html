@@ -15,15 +15,15 @@
       <div><strong>Elegí un período</strong><small>Las métricas se recalculan con las fechas seleccionadas.</small></div>
     </div>
     <div class="row align-items-end g-3">
-      <div class="col-sm-5 col-lg-4">
+      <div class="col-sm-6 col-lg-4">
         <label for="stats-desde" class="form-label">Desde</label>
         <input id="stats-desde" type="date" class="form-control" formControlName="desde">
       </div>
-      <div class="col-sm-5 col-lg-4">
+      <div class="col-sm-6 col-lg-4">
         <label for="stats-hasta" class="form-label">Hasta</label>
         <input id="stats-hasta" type="date" class="form-control" formControlName="hasta">
       </div>
-      <div class="col-sm-2">
+      <div class="col-12 col-lg-4 d-grid">
         <button class="btn btn-primary w-100" type="submit" [disabled]="cargando()">
           <i class="bi bi-arrow-repeat me-2" [class.spin-icon]="cargando()"></i>
           {{ cargando() ? 'Actualizando' : 'Aplicar filtros' }}
