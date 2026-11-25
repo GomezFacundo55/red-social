@@ -3,12 +3,14 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, isValidObjectId } from 'mongoose';
 import { UsersService } from '../users/users.service.js';
+import { ActivityService } from '../activity/activity.service.js';
 import type { ArchivoSubido } from '../auth/archivo-subido.js';
 import type { UsuarioToken } from '../auth/jwt-auth.guard.js';
 import { CrearPublicacionDto } from './dto/crear-publicacion.dto.js';
@@ -19,10 +21,13 @@ const DATOS_AUTOR = 'nombre apellido usuario imagenPerfil';
 
 @Injectable()
 export class PostsService {
+  private readonly logger = new Logger(PostsService.name);
+
   constructor(
     @InjectModel(Publicacion.name) private publicacionModel: Model<PublicacionDocument>,
     private usersService: UsersService,
     private config: ConfigService,
+    private activityService: ActivityService,
   ) {}
 
   async crear(autorId: string, dto: CrearPublicacionDto, imagen?: ArchivoSubido) {
@@ -123,6 +128,14 @@ export class PostsService {
 
     if (!actualizada) {
       throw new ConflictException('Ya le diste me gusta a esta publicación.');
+    }
+    try {
+      await this.activityService.registrarMeGusta(usuarioId, id);
+    } catch (error) {
+      this.logger.error(
+        'No se pudo registrar la actividad del me gusta.',
+        error instanceof Error ? error.stack : String(error),
+      );
     }
     return actualizada;
   }

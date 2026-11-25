@@ -6,7 +6,8 @@
   min-height: 220px;
   display: grid;
   place-items: center;
-  color: #748094;
+  color: var(--color-texto-secundario);
+  font-size: .84rem;
 }
 
 .bar-chart {
@@ -37,7 +38,7 @@
   height: 12px;
   overflow: hidden;
   border-radius: 99px;
-  background: #edf0f5;
+  background: var(--color-borde);
 }
 
 .bar-fill {
@@ -49,6 +50,7 @@
 }
 
 .bar-value {
+  color: var(--color-texto);
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
@@ -61,26 +63,26 @@
 }
 
 .chart-grid {
-  stroke: #e8ebf1;
+  stroke: var(--color-borde);
   stroke-width: 1;
 }
 
 .line-path {
   fill: none;
-  stroke: #5661d8;
+  stroke: var(--color-principal);
   stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .line-point {
-  fill: #fff;
-  stroke: #5661d8;
+  fill: var(--color-superficie);
+  stroke: var(--color-principal);
   stroke-width: 2;
 }
 
 .line-label {
-  fill: #748094;
+  fill: var(--color-texto-secundario);
   font-size: 11px;
 }
 
@@ -107,7 +109,9 @@
   display: grid;
   place-content: center;
   border-radius: 50%;
-  background: #fff;
+  color: var(--color-texto);
+  background: var(--color-superficie);
+  box-shadow: 0 0 0 1px var(--color-borde);
   text-align: center;
 }
 
@@ -116,7 +120,7 @@
 }
 
 .donut-center span {
-  color: #748094;
+  color: var(--color-texto-secundario);
   font-size: 0.72rem;
 }
 
@@ -134,6 +138,7 @@
   align-items: center;
   gap: 8px;
   font-size: 0.88rem;
+  color: var(--color-texto);
 }
 
 .legend-dot {

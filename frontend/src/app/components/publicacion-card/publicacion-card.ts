@@ -33,5 +33,4 @@ export class PublicacionCard {
     const usuario = this.auth.usuarioActual();
     return !!usuario && (usuario.perfil === 'administrador' || this.publicacion().autor._id === usuario._id);
   });
-
 }

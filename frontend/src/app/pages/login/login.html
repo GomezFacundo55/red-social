@@ -60,8 +60,8 @@
 </main>
 
 @if (modal) {
-  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
-    <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-backdrop-glass">
+    <div class="modal-dialog modal-dialog-centered" role="alertdialog" aria-modal="true">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{ modal.titulo }}</h5>

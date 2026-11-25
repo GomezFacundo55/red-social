@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service.js';
+import { ActivityService } from '../activity/activity.service.js';
 import { RegistroDto } from './dto/registro.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import type { ArchivoSubido } from './archivo-subido.js';
@@ -14,6 +15,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private activityService: ActivityService,
   ) {}
 
   async registro(dto: RegistroDto, imagen?: ArchivoSubido) {
@@ -43,6 +45,7 @@ export class AuthService {
       );
     }
 
+    await this.activityService.registrarIngreso(usuario._id.toString());
     const token = await this.firmar({
       sub: usuario._id.toString(),
       usuario: usuario.usuario,

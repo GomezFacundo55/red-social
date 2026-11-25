@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Comentario, ComentarioDocument } from './schemas/comentario.schema.js';
 import { Publicacion, PublicacionDocument } from './schemas/publicacion.schema.js';
 import { User, UserDocument } from '../users/schemas/user.schema.js';
+import { ActivityService } from '../activity/activity.service.js';
 
 const DIA_MS = 24 * 60 * 60 * 1000;
 const MAX_DIAS = 366;
@@ -20,6 +21,7 @@ export class StatsService {
     @InjectModel(Publicacion.name) private publicacionModel: Model<PublicacionDocument>,
     @InjectModel(Comentario.name) private comentarioModel: Model<ComentarioDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private activityService: ActivityService,
   ) {}
 
   async publicacionesPorUsuario(desde: string, hasta: string) {
@@ -99,6 +101,21 @@ export class StatsService {
       },
       { $sort: { cantidad: -1, titulo: 1 } },
     ]);
+  }
+
+  loginsPorUsuario(desde: string, hasta: string) {
+    const rango = this.validarRango(desde, hasta);
+    return this.activityService.loginsPorUsuario(rango.desde, rango.hasta);
+  }
+
+  visitasPerfilPorUsuario(desde: string, hasta: string) {
+    const rango = this.validarRango(desde, hasta);
+    return this.activityService.visitasPerfilPorUsuario(rango.desde, rango.hasta);
+  }
+
+  meGustaPorFecha(desde: string, hasta: string) {
+    const rango = this.validarRango(desde, hasta);
+    return this.activityService.meGustaPorFecha(rango.desde, rango.hasta, rango.dias);
   }
 
   private pipelineComentariosActivos(rango: RangoFechas) {

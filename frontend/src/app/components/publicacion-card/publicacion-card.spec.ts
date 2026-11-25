@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
@@ -7,14 +8,16 @@ import { PublicacionCard } from './publicacion-card';
 describe('PublicacionCard', () => {
   let component: PublicacionCard;
   let fixture: ComponentFixture<PublicacionCard>;
+  let usuarioActual: ReturnType<typeof signal<{ _id: string; perfil: string } | null>>;
 
   beforeEach(async () => {
+    usuarioActual = signal(null);
     await TestBed.configureTestingModule({
       imports: [PublicacionCard],
       providers: [
         provideHttpClient(),
         provideRouter([]),
-        { provide: AuthService, useValue: { usuarioActual: () => null } },
+        { provide: AuthService, useValue: { usuarioActual } },
       ],
     }).compileComponents();
 
@@ -41,5 +44,13 @@ describe('PublicacionCard', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('keeps administrator deletion available in read-only profile cards', () => {
+    usuarioActual.set({ _id: 'admin1', perfil: 'administrador' });
+    fixture.componentRef.setInput('soloLectura', true);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.publication-delete')).toBeTruthy();
   });
 });

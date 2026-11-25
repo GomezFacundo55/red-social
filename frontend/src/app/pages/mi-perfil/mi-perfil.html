@@ -1,42 +1,123 @@
-<main class="container py-4" style="max-width: 760px;">
-  @if (usuario(); as u) {
-    <section class="card shadow-sm mb-4">
-      <div class="card-body">
-        <div class="d-flex flex-column flex-sm-row align-items-center gap-3 mb-3">
-          <img [src]="u.imagenPerfil | urlImagen" alt="Foto de perfil" width="120" height="120"
-               class="rounded-circle object-fit-cover border">
-          <div class="text-center text-sm-start">
-            <h1 class="h3 mb-1">{{ u.nombre }} {{ u.apellido }}</h1>
-            <p class="text-body-secondary mb-1">&#64;{{ u.usuario }}</p>
-            <span class="badge text-bg-primary">{{ u.perfil }}</span>
+<main class="page-shell profile-page">
+  @if (cargando()) {
+    <div class="feed-loading" role="status">
+      <span class="loading-orbit"></span>
+      <span>Cargando perfil...</span>
+    </div>
+  } @else if (error()) {
+    <div class="alert alert-danger" role="alert">{{ error() }}</div>
+  } @else if (usuario(); as u) {
+    <section class="profile-hero surface-card">
+      <div class="profile-hero__cover">
+        <span class="profile-orbit profile-orbit--one"></span>
+        <span class="profile-orbit profile-orbit--two"></span>
+        <span class="profile-cover-label">
+          <i class="bi bi-stars"></i>{{ esPropio() ? 'Mi espacio' : 'Perfil de la comunidad' }}
+        </span>
+      </div>
+      <div class="profile-hero__body">
+        <div class="profile-identity">
+          <img [src]="u.imagenPerfil | urlImagen" alt="Foto de perfil" class="profile-avatar">
+          <div class="profile-identity__copy">
+            <p class="page-eyebrow">
+              {{ esPropio() ? 'Tu perfil en la comunidad' : 'Perfil de la comunidad' }}
+            </p>
+            <h1>{{ u.nombre }} {{ u.apellido }}</h1>
+            <p class="profile-handle">&#64;{{ u.usuario }}</p>
+            <span class="profile-role">
+              <i class="bi" [class.bi-shield-check]="u.perfil === 'administrador'"
+                 [class.bi-person-check]="u.perfil !== 'administrador'"></i>
+              {{ u.perfil === 'administrador' ? 'Administrador' : 'Miembro de la comunidad' }}
+            </span>
           </div>
         </div>
 
-        <p class="mb-3">{{ u.descripcion }}</p>
+        <p class="profile-description">{{ u.descripcion }}</p>
 
-        <dl class="row mb-0">
-          <dt class="col-sm-4">Correo</dt>
-          <dd class="col-sm-8">{{ u.correo }}</dd>
-          <dt class="col-sm-4">Fecha de nacimiento</dt>
-          <dd class="col-sm-8">{{ u.fechaNacimiento | date: 'dd/MM/yyyy' : 'UTC' }}</dd>
-          <dt class="col-sm-4">Miembro desde</dt>
-          <dd class="col-sm-8 mb-0">{{ u.createdAt | date: 'dd/MM/yyyy' }}</dd>
-        </dl>
+        <div class="profile-facts">
+          @if (esPropio() && u.correo) {
+            <div><span class="icon-tile"><i class="bi bi-envelope"></i></span>
+              <span><small>Correo electrónico</small><strong>{{ u.correo }}</strong></span></div>
+          }
+          @if (esPropio() && u.fechaNacimiento) {
+            <div><span class="icon-tile"><i class="bi bi-calendar-heart"></i></span>
+              <span><small>Fecha de nacimiento</small>
+                <strong>{{ u.fechaNacimiento | date: 'dd/MM/yyyy' : 'UTC' }}</strong></span></div>
+          }
+          <div><span class="icon-tile"><i class="bi bi-calendar2-check"></i></span>
+            <span><small>En la comunidad desde</small>
+              <strong>{{ u.createdAt | date: 'dd/MM/yyyy' }}</strong></span></div>
+        </div>
       </div>
     </section>
 
-    <h2 class="h5 mb-3">Mis últimas publicaciones</h2>
+    <header class="profile-posts-heading">
+      <div>
+        <p class="page-eyebrow">{{ esPropio() ? 'Tu actividad' : 'Actividad reciente' }}</p>
+        <h2>{{ esPropio() ? 'Mis últimas publicaciones' : 'Últimas publicaciones' }}</h2>
+      </div>
+      <span class="icon-tile"><i class="bi bi-grid"></i></span>
+    </header>
 
-    @if (cargando()) {
-      <p class="text-body-secondary">Cargando publicaciones...</p>
-    } @else if (error()) {
-      <p class="text-danger">{{ error() }}</p>
-    } @else if (publicaciones().length === 0) {
-      <p class="text-body-secondary">Todavía no publicaste nada.</p>
+    @if (publicaciones().length === 0) {
+      <div class="profile-empty surface-card">
+        <span class="icon-tile"><i class="bi bi-feather"></i></span>
+        <div>
+          <strong>{{ esPropio() ? 'Tu primera historia empieza acá' : 'Todavía no hay publicaciones' }}</strong>
+          <p>
+            {{ esPropio()
+              ? 'Cuando publiques algo, vas a poder volver a encontrarlo en este espacio.'
+              : 'Cuando comparta una historia, va a aparecer en este perfil.' }}
+          </p>
+        </div>
+      </div>
     }
 
     @for (p of publicaciones(); track p._id) {
-      <app-publicacion-card [publicacion]="p" [soloLectura]="true" />
+      <app-publicacion-card
+        [publicacion]="p"
+        [soloLectura]="true"
+        [ocupado]="ocupadoId() === p._id"
+        (eliminar)="pedirEliminar($event)" />
     }
   }
 </main>
+
+@if (porEliminar(); as publicacion) {
+  <div class="modal-backdrop-glass" (click)="cancelarEliminar()">
+    <div class="modal-dialog modal-dialog-centered" role="dialog" aria-modal="true"
+         (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title h5">Dar de baja publicación</h2>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">
+            ¿Querés ocultar «{{ publicacion.titulo }}»? La publicación y sus comentarios dejarán de estar disponibles.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" (click)="cancelarEliminar()">
+            Cancelar
+          </button>
+          <button type="button" class="btn btn-danger" [disabled]="ocupadoId() !== null"
+                  (click)="confirmarEliminar()">Dar de baja</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalError()) {
+  <div class="modal-backdrop-glass">
+    <div class="modal-dialog modal-dialog-centered" role="alertdialog" aria-modal="true">
+      <div class="modal-content">
+        <div class="modal-header"><h2 class="modal-title h5">No se pudo dar de baja</h2></div>
+        <div class="modal-body"><p class="mb-0">{{ modalError() }}</p></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="cerrarError()">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

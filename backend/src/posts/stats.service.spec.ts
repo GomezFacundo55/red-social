@@ -5,6 +5,7 @@ import { Comentario } from './schemas/comentario.schema.js';
 import { Publicacion } from './schemas/publicacion.schema.js';
 import { StatsService } from './stats.service.js';
 import { User } from '../users/schemas/user.schema.js';
+import { ActivityService } from '../activity/activity.service.js';
 
 describe('StatsService', () => {
   let service: StatsService;
@@ -26,6 +27,7 @@ describe('StatsService', () => {
           provide: getModelToken(User.name),
           useValue: { collection: { name: 'users' } },
         },
+        { provide: ActivityService, useValue: {} },
       ],
     }).compile();
     service = module.get<StatsService>(StatsService);

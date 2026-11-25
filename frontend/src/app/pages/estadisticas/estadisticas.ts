@@ -25,6 +25,9 @@ export class Estadisticas {
   publicaciones = signal<PuntoEstadistico[]>([]);
   comentariosPorDia = signal<PuntoEstadistico[]>([]);
   comentariosPorPublicacion = signal<PuntoEstadistico[]>([]);
+  loginsPorUsuario = signal<PuntoEstadistico[]>([]);
+  visitasPerfil = signal<PuntoEstadistico[]>([]);
+  meGustaPorDia = signal<PuntoEstadistico[]>([]);
 
   rango = this.fb.group({
     desde: [this.fechaInicial(), [Validators.required]],
@@ -51,6 +54,9 @@ export class Estadisticas {
       publicaciones: this.servicio.publicacionesPorUsuario(desde, hasta),
       comentarios: this.servicio.comentariosPorFecha(desde, hasta),
       publicacionesComentarios: this.servicio.comentariosPorPublicacion(desde, hasta),
+      logins: this.servicio.loginsPorUsuario(desde, hasta),
+      visitas: this.servicio.visitasPerfilPorUsuario(desde, hasta),
+      meGusta: this.servicio.meGustaPorFecha(desde, hasta),
     }).subscribe({
       next: (datos) => {
         this.publicaciones.set(
@@ -68,6 +74,24 @@ export class Estadisticas {
         this.comentariosPorPublicacion.set(
           datos.publicacionesComentarios.map((item) => ({
             etiqueta: item.titulo,
+            cantidad: item.cantidad,
+          })),
+        );
+        this.loginsPorUsuario.set(
+          datos.logins.map((item) => ({
+            etiqueta: `${item.etiqueta} (@${item.usuario})`,
+            cantidad: item.cantidad,
+          })),
+        );
+        this.visitasPerfil.set(
+          datos.visitas.map((item) => ({
+            etiqueta: `${item.etiqueta} (@${item.usuario})`,
+            cantidad: item.cantidad,
+          })),
+        );
+        this.meGustaPorDia.set(
+          datos.meGusta.map((item) => ({
+            etiqueta: item.fecha.slice(5),
             cantidad: item.cantidad,
           })),
         );

@@ -5,10 +5,12 @@ import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { UsersModule } from '../users/users.module.js';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
+import { ActivityModule } from '../activity/activity.module.js';
 
 @Module({
   imports: [
     UsersModule,
+    ActivityModule,
     JwtModule.registerAsync({
       global: true,
       inject: [ConfigService],

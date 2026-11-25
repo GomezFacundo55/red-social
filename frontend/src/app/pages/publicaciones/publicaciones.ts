@@ -1,7 +1,17 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, inject, signal } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  ViewChild,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { PublicacionCard } from '../../components/publicacion-card/publicacion-card';
+import { UrlImagenPipe } from '../../pipes/url-imagen.pipe';
 import { Orden, Publicacion } from '../../models/publicacion';
 import { AuthService } from '../../services/auth.service';
 import { PublicacionesService } from '../../services/publicaciones.service';
@@ -10,20 +20,20 @@ const POR_PAGINA = 5;
 
 @Component({
   selector: 'app-publicaciones',
-  imports: [ReactiveFormsModule, PublicacionCard],
+  imports: [ReactiveFormsModule, PublicacionCard, RouterLink, UrlImagenPipe],
   templateUrl: './publicaciones.html',
   styleUrl: './publicaciones.css',
 })
-export class Publicaciones {
+export class Publicaciones implements AfterViewInit, OnDestroy {
   private servicio = inject(PublicacionesService);
-  private auth = inject(AuthService);
+  auth = inject(AuthService);
   private fb = inject(FormBuilder);
 
   items = signal<Publicacion[]>([]);
   total = signal(0);
-  pagina = signal(1);
   orden = signal<Orden>('fecha');
   cargando = signal(false);
+  hayMas = signal(true);
   ocupadoId = signal<string | null>(null);
 
   porEliminar = signal<Publicacion | null>(null);
@@ -39,28 +49,52 @@ export class Publicaciones {
     descripcion: ['', [Validators.required, Validators.maxLength(1000)]],
   });
 
-  totalPaginas = computed(() => Math.max(1, Math.ceil(this.total() / POR_PAGINA)));
+  @ViewChild('sentinel') private sentinel?: ElementRef<HTMLElement>;
+
+  private observer: IntersectionObserver | null = null;
+  private frameId: number | null = null;
+  private cargaVersion = 0;
 
   constructor() {
-    this.cargar();
+    this.cargarMas();
   }
 
-  cargar() {
+  ngAfterViewInit() {
+    if (typeof IntersectionObserver === 'undefined') return;
+    this.observer = new IntersectionObserver(
+      (entradas) => {
+        if (entradas.some((entrada) => entrada.isIntersecting)) this.cargarMas();
+      },
+      { rootMargin: '500px 0px' },
+    );
+    if (this.sentinel) this.observer.observe(this.sentinel.nativeElement);
+  }
+
+  ngOnDestroy() {
+    this.observer?.disconnect();
+    if (this.frameId !== null) cancelAnimationFrame(this.frameId);
+  }
+
+  cargarMas() {
+    if (this.cargando() || !this.hayMas()) return;
+
+    const version = this.cargaVersion;
+    const offset = this.items().length;
     this.cargando.set(true);
-    const offset = (this.pagina() - 1) * POR_PAGINA;
     this.servicio.listar(this.orden(), offset, POR_PAGINA).subscribe({
       next: (res) => {
-        const paginas = Math.max(1, Math.ceil(res.total / POR_PAGINA));
-        if (this.pagina() > paginas) {
-          this.pagina.set(paginas);
-          this.cargar();
-          return;
-        }
-        this.items.set(res.items);
+        if (version !== this.cargaVersion) return;
+        const actuales = this.items();
+        const idsActuales = new Set(actuales.map((item) => item._id));
+        const nuevos = res.items.filter((item) => !idsActuales.has(item._id));
+        this.items.set([...actuales, ...nuevos]);
         this.total.set(res.total);
+        this.hayMas.set(nuevos.length > 0 && this.items().length < res.total);
         this.cargando.set(false);
+        this.cargarSiSentinelVisible();
       },
       error: (err) => {
+        if (version !== this.cargaVersion) return;
         this.cargando.set(false);
         this.mostrarError('No se pudieron cargar las publicaciones', err);
       },
@@ -70,13 +104,7 @@ export class Publicaciones {
   cambiarOrden(orden: Orden) {
     if (orden === this.orden()) return;
     this.orden.set(orden);
-    this.pagina.set(1);
-    this.cargar();
-  }
-
-  irAPagina(numero: number) {
-    this.pagina.set(numero);
-    this.cargar();
+    this.reiniciarFeed();
   }
 
   alternarMeGusta(publicacion: Publicacion) {
@@ -115,7 +143,14 @@ export class Publicaciones {
       next: () => {
         this.porEliminar.set(null);
         this.ocupadoId.set(null);
-        this.cargar();
+        if (this.cargando()) {
+          this.reiniciarFeed();
+          return;
+        }
+        this.items.update((items) => items.filter((item) => item._id !== publicacion._id));
+        this.total.update((total) => Math.max(0, total - 1));
+        this.hayMas.set(this.items().length < this.total());
+        if (this.hayMas()) this.cargarMas();
       },
       error: (err) => {
         this.porEliminar.set(null);
@@ -169,8 +204,7 @@ export class Publicaciones {
         this.enviando.set(false);
         this.mostrarFormulario.set(false);
         this.orden.set('fecha');
-        this.pagina.set(1);
-        this.cargar();
+        this.reiniciarFeed();
       },
       error: (err) => {
         this.enviando.set(false);
@@ -181,6 +215,30 @@ export class Publicaciones {
 
   cerrarError() {
     this.modalError.set(null);
+  }
+
+  private reiniciarFeed() {
+    this.cargaVersion++;
+    this.items.set([]);
+    this.total.set(0);
+    this.hayMas.set(true);
+    this.cargando.set(false);
+    this.cargarMas();
+  }
+
+  private cargarSiSentinelVisible() {
+    const sentinel = this.sentinel?.nativeElement;
+    if (!this.observer || !sentinel || !this.hayMas() || this.cargando() || this.frameId !== null) {
+      return;
+    }
+
+    this.frameId = requestAnimationFrame(() => {
+      this.frameId = null;
+      if (!this.hayMas() || this.cargando()) return;
+      if (sentinel.getBoundingClientRect().top <= window.innerHeight + 500) {
+        this.cargarMas();
+      }
+    });
   }
 
   private mostrarError(titulo: string, err: HttpErrorResponse) {

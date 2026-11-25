@@ -4,7 +4,7 @@ import { PuntoEstadistico } from '../../services/estadisticas.service';
 
 export type TipoGrafico = 'barras' | 'linea' | 'dona';
 
-const COLORES = ['#5661d8', '#e87945', '#21a179', '#cc4f87', '#4797c7', '#9d71c8'];
+const COLORES = ['#1D9BF0', '#F91880', '#00BA7C'];
 
 @Component({
   selector: 'app-estadistica-grafico',
@@ -38,7 +38,7 @@ export class EstadisticaGrafico {
 
   fondoDona = computed(() => {
     const total = this.total();
-    if (!total) return '#e9edf3';
+    if (!total) return '#2F3336';
     let inicio = 0;
     const segmentos = this.puntos().map((punto, indice) => {
       const fin = inicio + (punto.cantidad / total) * 100;

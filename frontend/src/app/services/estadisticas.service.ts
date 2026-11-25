@@ -39,6 +39,25 @@ export class EstadisticasService {
     );
   }
 
+  loginsPorUsuario(desde: string, hasta: string) {
+    return this.http.get<PublicacionesPorUsuario[]>(`${this.api}/logins-por-usuario`, {
+      params: this.rango(desde, hasta),
+    });
+  }
+
+  visitasPerfilPorUsuario(desde: string, hasta: string) {
+    return this.http.get<PublicacionesPorUsuario[]>(`${this.api}/visitas-perfil`, {
+      params: this.rango(desde, hasta),
+    });
+  }
+
+  meGustaPorFecha(desde: string, hasta: string) {
+    return this.http.get<Array<{ fecha: string; cantidad: number }>>(
+      `${this.api}/me-gusta-por-fecha`,
+      { params: this.rango(desde, hasta) },
+    );
+  }
+
   private rango(desde: string, hasta: string) {
     return new HttpParams().set('desde', desde).set('hasta', hasta);
   }

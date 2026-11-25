@@ -1,10 +1,13 @@
-<main class="container py-4 admin-page">
-  <header class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+<main class="page-shell admin-page">
+  <header class="admin-heading">
     <div>
-      <p class="text-uppercase text-primary fw-semibold small mb-1">Administración</p>
-      <h1 class="h2 mb-0">Usuarios</h1>
+      <p class="page-eyebrow">Centro de control</p>
+      <h1 class="page-title">Usuarios</h1>
+      <p class="page-subtitle">Administrá los perfiles y el acceso a la comunidad.</p>
     </div>
-    <button class="btn btn-primary" type="button" (click)="abrirFormulario()">Crear usuario</button>
+    <button class="btn btn-primary admin-create" type="button" (click)="abrirFormulario()">
+      <i class="bi bi-person-plus-fill me-2"></i>Crear usuario
+    </button>
   </header>
 
   @if (error()) {
@@ -14,17 +17,20 @@
     <div class="alert alert-success" role="status">{{ exito() }}</div>
   }
 
-  <section class="card shadow-sm mb-4" aria-labelledby="usuarios-titulo">
-    <div class="card-header d-flex align-items-center justify-content-between">
-      <h2 id="usuarios-titulo" class="h5 mb-0">Cuentas registradas</h2>
-      <span class="badge text-bg-light">{{ total() }} en total</span>
+  <section class="card admin-table-card" aria-labelledby="usuarios-titulo">
+    <div class="card-header admin-table-card__header">
+      <div>
+        <h2 id="usuarios-titulo" class="h5 mb-1">Cuentas de la comunidad</h2>
+        <p>Revisá roles y estados de acceso.</p>
+      </div>
+      <span class="admin-total"><i class="bi bi-people-fill"></i>{{ total() }} <small>usuarios</small></span>
     </div>
     @if (cargando() && usuarios().length === 0) {
       <div class="card-body text-body-secondary">Cargando usuarios...</div>
     } @else if (usuarios().length === 0) {
       <div class="card-body text-body-secondary">No hay usuarios para mostrar.</div>
     } @else {
-      <div class="table-responsive">
+      <div class="table-responsive admin-table-scroll">
         <table class="table align-middle mb-0">
           <thead>
             <tr>
@@ -40,7 +46,8 @@
             @for (usuario of usuarios(); track usuario._id) {
               <tr>
                 <td>
-                  <div class="d-flex align-items-center gap-2">
+                  <a class="admin-profile-link" [routerLink]="['/usuarios', usuario._id]"
+                     [attr.aria-label]="'Ver el perfil de ' + usuario.nombre + ' ' + usuario.apellido">
                     @if (usuario.imagenPerfil) {
                       <img class="admin-avatar" [src]="usuario.imagenPerfil | urlImagen" alt="">
                     } @else {
@@ -52,12 +59,12 @@
                       <div class="fw-semibold">{{ usuario.nombre }} {{ usuario.apellido }}</div>
                       <small class="text-body-secondary">&#64;{{ usuario.usuario }}</small>
                     </div>
-                  </div>
+                  </a>
                 </td>
                 <td>{{ usuario.correo }}</td>
                 <td>{{ usuario.perfil === 'administrador' ? 'Administrador' : 'Usuario' }}</td>
                 <td>
-                  <span class="badge" [appEstadoUsuario]="usuario.habilitado">
+                  <span class="badge status-chip" [appEstadoUsuario]="usuario.habilitado">
                     {{ usuario.habilitado ? 'Habilitado' : 'Deshabilitado' }}
                   </span>
                 </td>
@@ -70,8 +77,11 @@
                             [disabled]="ocupadoId() === usuario._id"
                             (click)="cambiarEstado(usuario)">
                       @if (ocupadoId() === usuario._id) {
+                        <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
                         Actualizando...
                       } @else {
+                        <i class="bi me-1" [class.bi-slash-circle]="usuario.habilitado"
+                           [class.bi-check-circle]="!usuario.habilitado"></i>
                         {{ usuario.habilitado ? 'Deshabilitar' : 'Habilitar' }}
                       }
                     </button>
@@ -99,14 +109,16 @@
 </main>
 
 @if (mostrarFormulario()) {
-  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+  <div class="modal-backdrop-glass" (click)="cerrarFormulario()">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable"
+         role="dialog" aria-modal="true" aria-labelledby="admin-user-title"
+         (click)="$event.stopPropagation()">
       <div class="modal-content">
         <form [formGroup]="form" (ngSubmit)="crear()" novalidate>
           <div class="modal-header">
             <div>
               <p class="text-uppercase text-primary fw-semibold small mb-1">Alta de cuenta</p>
-              <h2 class="modal-title h5">Nuevo usuario</h2>
+              <h2 id="admin-user-title" class="modal-title h5">Nuevo usuario</h2>
             </div>
             <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarFormulario()"></button>
           </div>
@@ -191,14 +203,19 @@
               </div>
               <fieldset class="col-12">
                 <legend class="form-label">Perfil</legend>
-                <div class="d-flex gap-4">
-                  <label class="form-check">
-                    <input class="form-check-input" type="radio" formControlName="perfil" value="usuario">
-                    <span class="form-check-label">Usuario</span>
+                <div class="role-options">
+                  <label class="role-option" [class.role-option--selected]="f.perfil.value === 'usuario'">
+                    <input type="radio" formControlName="perfil" value="usuario">
+                    <span class="role-option__icon"><i class="bi bi-person"></i></span>
+                    <span><strong>Usuario</strong><small>Participa en la comunidad</small></span>
+                    <i class="bi bi-check-circle-fill role-option__check"></i>
                   </label>
-                  <label class="form-check">
-                    <input class="form-check-input" type="radio" formControlName="perfil" value="administrador">
-                    <span class="form-check-label">Administrador</span>
+                  <label class="role-option"
+                         [class.role-option--selected]="f.perfil.value === 'administrador'">
+                    <input type="radio" formControlName="perfil" value="administrador">
+                    <span class="role-option__icon"><i class="bi bi-shield-lock"></i></span>
+                    <span><strong>Administrador</strong><small>Gestiona usuarios y métricas</small></span>
+                    <i class="bi bi-check-circle-fill role-option__check"></i>
                   </label>
                 </div>
               </fieldset>

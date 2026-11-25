@@ -1,27 +1,56 @@
 @if (auth.estaLogueado()) {
-  <nav class="navbar navbar-expand bg-body border-bottom px-3">
-    <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/publicaciones">
-      <img src="red-social.jpg" alt="" width="32" height="32" class="rounded">
-      <span>Red-Social</span>
-    </a>
+  <nav class="social-nav" aria-label="Navegación principal">
+    <div class="social-nav__shell">
+      <a class="social-brand" routerLink="/publicaciones" aria-label="Red-Social, inicio">
+        <span class="social-brand__mark">
+          <img src="red-social.jpg" alt="">
+        </span>
+        <span class="social-brand__name">Red<span>Social</span></span>
+      </a>
 
-    <ul class="navbar-nav me-auto">
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/publicaciones" routerLinkActive="active">Publicaciones</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/mi-perfil" routerLinkActive="active">Mi perfil</a>
-      </li>
-      <li class="nav-item" *appSoloAdmin>
-        <a class="nav-link" routerLink="/dashboard/usuarios" routerLinkActive="active">Usuarios</a>
-      </li>
-      <li class="nav-item" *appSoloAdmin>
-        <a class="nav-link" routerLink="/dashboard/estadisticas" routerLinkActive="active">Estadísticas</a>
-      </li>
-    </ul>
+      <div class="social-nav__links">
+        <a class="social-nav__link" routerLink="/publicaciones" routerLinkActive="is-active"
+           [routerLinkActiveOptions]="{ exact: true }">
+          <span class="icon-tile"><i class="bi bi-grid-1x2-fill"></i></span>
+          <span>Inicio</span>
+        </a>
+        <a class="social-nav__link" routerLink="/mi-perfil" routerLinkActive="is-active">
+          <span class="icon-tile"><i class="bi bi-person-fill"></i></span>
+          <span>Mi perfil</span>
+        </a>
+        <a class="social-nav__link" *appSoloAdmin routerLink="/dashboard/usuarios"
+           routerLinkActive="is-active">
+          <span class="icon-tile"><i class="bi bi-people-fill"></i></span>
+          <span>Usuarios</span>
+        </a>
+        <a class="social-nav__link" *appSoloAdmin routerLink="/dashboard/estadisticas"
+           routerLinkActive="is-active">
+          <span class="icon-tile"><i class="bi bi-bar-chart-fill"></i></span>
+          <span>Estadísticas</span>
+        </a>
+      </div>
 
-    <button type="button" class="btn btn-outline-primary btn-sm" (click)="cerrarSesion()">
-      Cerrar sesión
-    </button>
+      @if (auth.usuarioActual(); as usuario) {
+        <div class="social-nav__account">
+          <a class="account-chip" routerLink="/mi-perfil" aria-label="Abrir mi perfil">
+            @if (usuario.imagenPerfil) {
+              <img class="account-chip__avatar" [src]="usuario.imagenPerfil | urlImagen" alt="">
+            } @else {
+              <span class="account-chip__avatar account-chip__fallback">
+                {{ usuario.nombre.charAt(0) }}{{ usuario.apellido.charAt(0) }}
+              </span>
+            }
+            <span class="account-chip__copy">
+              <strong>{{ usuario.nombre }}</strong>
+              <small>&#64;{{ usuario.usuario }}</small>
+            </span>
+          </a>
+          <button type="button" class="icon-tile logout-tile" (click)="cerrarSesion()"
+                  aria-label="Cerrar sesión" title="Cerrar sesión">
+            <i class="bi bi-box-arrow-right"></i>
+          </button>
+        </div>
+      }
+    </div>
   </nav>
 }

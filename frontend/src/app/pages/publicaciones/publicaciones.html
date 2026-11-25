@@ -1,68 +1,168 @@
-<main class="container py-4" style="max-width: 760px;">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h3 mb-0">Publicaciones</h1>
-    <button type="button" class="btn btn-primary" (click)="abrirFormulario()">Nueva publicación</button>
+<main class="page-shell feed-page">
+  <div class="feed-grid">
+    <section class="feed-main">
+      <header class="feed-welcome">
+        <div class="feed-welcome__copy">
+          <p class="page-eyebrow">Tu comunidad, en un solo lugar</p>
+          <h1 class="page-title">
+            @if (auth.usuarioActual(); as usuario) {
+              Hola, {{ usuario.nombre }} <span class="wave-emoji">✦</span>
+            } @else {
+              Tu comunidad
+            }
+          </h1>
+          <p class="page-subtitle">Ideas, momentos y personas que hacen el día un poco mejor.</p>
+        </div>
+        <div class="feed-welcome__count">
+          <span class="icon-tile"><i class="bi bi-stars"></i></span>
+          <span><strong>{{ total() }}</strong><small>publicaciones</small></span>
+        </div>
+      </header>
+
+      <section class="composer-card surface-card" aria-label="Crear publicación">
+        @if (auth.usuarioActual(); as usuario) {
+          @if (usuario.imagenPerfil) {
+            <img class="composer-avatar" [src]="usuario.imagenPerfil | urlImagen" alt="">
+          } @else {
+            <span class="composer-avatar composer-avatar--fallback">
+              {{ usuario.nombre.charAt(0) }}{{ usuario.apellido.charAt(0) }}
+            </span>
+          }
+        }
+        <button class="composer-prompt" type="button" (click)="abrirFormulario()">
+          ¿Qué te gustaría compartir?
+        </button>
+        <button class="composer-action" type="button" (click)="abrirFormulario()"
+                aria-label="Agregar foto o publicación" title="Crear publicación">
+          <i class="bi bi-plus-lg"></i>
+        </button>
+      </section>
+
+      <div class="feed-toolbar">
+        <div>
+          <h2 class="feed-section-title">El feed</h2>
+          <p class="feed-section-caption">Lo último que está pasando.</p>
+        </div>
+        <div class="feed-sort" role="group" aria-label="Ordenar publicaciones">
+          <button type="button" [class.is-selected]="orden() === 'fecha'"
+                  (click)="cambiarOrden('fecha')">
+            <i class="bi bi-clock-history"></i><span>Recientes</span>
+          </button>
+          <button type="button" [class.is-selected]="orden() === 'meGusta'"
+                  (click)="cambiarOrden('meGusta')">
+            <i class="bi bi-heart-fill"></i><span>Populares</span>
+          </button>
+        </div>
+      </div>
+
+      @if (cargando() && items().length === 0) {
+        <div class="feed-loading" role="status">
+          <span class="loading-orbit"></span>
+          <span>Cargando historias...</span>
+        </div>
+      } @else if (items().length === 0) {
+        <section class="feed-empty surface-card">
+          <span class="feed-empty__icon"><i class="bi bi-chat-square-heart"></i></span>
+          <h3>El feed está esperando su primera historia</h3>
+          <p>Compartí una idea, una foto o algo lindo que te haya pasado.</p>
+          <button type="button" class="btn btn-primary" (click)="abrirFormulario()">
+            <i class="bi bi-plus-lg me-2"></i>Crear publicación
+          </button>
+        </section>
+      }
+
+      <div class="feed-list">
+        @for (p of items(); track p._id; let i = $index) {
+          <app-publicacion-card
+            [publicacion]="p"
+            [ocupado]="ocupadoId() === p._id"
+            [style.--card-index]="i"
+            (alternarMeGusta)="alternarMeGusta($event)"
+            (eliminar)="pedirEliminar($event)" />
+        }
+      </div>
+
+      @if (cargando() && items().length > 0) {
+        <div class="feed-loading" role="status">
+          <span class="loading-orbit"></span>
+          <span>Cargando más publicaciones...</span>
+        </div>
+      } @else if (!hayMas() && items().length > 0) {
+        <p class="feed-section-caption text-center py-3">Ya viste todas las publicaciones.</p>
+      }
+      <div #sentinel aria-hidden="true" style="height: 1px"></div>
+    </section>
+
+    <aside class="feed-aside">
+      @if (auth.usuarioActual(); as usuario) {
+        <section class="profile-peek surface-card">
+          <div class="profile-peek__cover"></div>
+          @if (usuario.imagenPerfil) {
+            <img class="profile-peek__avatar" [src]="usuario.imagenPerfil | urlImagen" alt="">
+          } @else {
+            <span class="profile-peek__avatar profile-peek__avatar--fallback">
+              {{ usuario.nombre.charAt(0) }}{{ usuario.apellido.charAt(0) }}
+            </span>
+          }
+          <div class="profile-peek__body">
+            <strong>{{ usuario.nombre }} {{ usuario.apellido }}</strong>
+            <span>&#64;{{ usuario.usuario }}</span>
+            <a routerLink="/mi-perfil" class="profile-peek__link">
+              Ver mi perfil <i class="bi bi-arrow-up-right"></i>
+            </a>
+          </div>
+          <div class="profile-peek__footer">
+            <span><i class="bi bi-collection"></i> {{ total() }} en el feed</span>
+            <span><i class="bi bi-shield-check"></i> Comunidad</span>
+          </div>
+        </section>
+      }
+
+      <section class="aside-note surface-card">
+        <span class="aside-note__spark"><i class="bi bi-lightbulb"></i></span>
+        <p class="page-eyebrow">Un buen comienzo</p>
+        <h3>Compartí algo que te represente.</h3>
+        <p>Una pequeña historia puede ser el inicio de una gran conversación.</p>
+        <button type="button" class="aside-note__button" (click)="abrirFormulario()">
+          Crear una publicación <i class="bi bi-arrow-right"></i>
+        </button>
+      </section>
+      <p class="feed-aside__footer">Red-Social <span>·</span> Un espacio para conectar.</p>
+    </aside>
   </div>
-
-  <div class="btn-group mb-3" role="group" aria-label="Ordenar publicaciones">
-    <button type="button" class="btn btn-sm"
-            [class.btn-primary]="orden() === 'fecha'" [class.btn-outline-primary]="orden() !== 'fecha'"
-            (click)="cambiarOrden('fecha')">Más recientes</button>
-    <button type="button" class="btn btn-sm"
-            [class.btn-primary]="orden() === 'meGusta'" [class.btn-outline-primary]="orden() !== 'meGusta'"
-            (click)="cambiarOrden('meGusta')">Más me gusta</button>
-  </div>
-
-  @if (cargando() && items().length === 0) {
-    <p class="text-body-secondary">Cargando publicaciones...</p>
-  } @else if (items().length === 0) {
-    <div class="text-center text-body-secondary py-5">
-      Todavía no hay publicaciones. Sé la primera persona en publicar.
-    </div>
-  }
-
-  @for (p of items(); track p._id) {
-    <app-publicacion-card
-      [publicacion]="p"
-      [ocupado]="ocupadoId() === p._id"
-      (alternarMeGusta)="alternarMeGusta($event)"
-      (eliminar)="pedirEliminar($event)" />
-  }
-
-  @if (total() > 0) {
-    <nav class="d-flex align-items-center justify-content-between mt-3" aria-label="Paginación">
-      <button type="button" class="btn btn-outline-primary btn-sm"
-              [disabled]="pagina() === 1 || cargando()" (click)="irAPagina(pagina() - 1)">Anterior</button>
-      <span class="text-body-secondary">Página {{ pagina() }} de {{ totalPaginas() }}</span>
-      <button type="button" class="btn btn-outline-primary btn-sm"
-              [disabled]="pagina() >= totalPaginas() || cargando()" (click)="irAPagina(pagina() + 1)">Siguiente</button>
-    </nav>
-  }
 </main>
 
 @if (mostrarFormulario()) {
-  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
-    <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-backdrop-glass" (click)="cerrarFormulario()">
+    <div class="modal-dialog modal-dialog-centered composer-modal"
+         role="dialog" aria-modal="true" aria-labelledby="post-modal-title" (click)="$event.stopPropagation()">
       <div class="modal-content">
         <form [formGroup]="formPost" (ngSubmit)="publicar()" novalidate>
           <div class="modal-header">
-            <h5 class="modal-title">Nueva publicación</h5>
+            <div>
+              <p class="page-eyebrow mb-1">Tu voz merece espacio</p>
+              <h2 id="post-modal-title" class="modal-title h5">Crear publicación</h2>
+            </div>
+            <button type="button" class="btn-close" aria-label="Cerrar"
+                    (click)="cerrarFormulario()"></button>
           </div>
-          <div class="modal-body">
+          <div class="modal-body p-4">
             <div class="mb-3">
               <label class="form-label" for="post-titulo">Título</label>
               <input id="post-titulo" type="text" class="form-control" formControlName="titulo"
+                     placeholder="Poné un título que invite a leer"
                      [class.is-invalid]="formPost.controls.titulo.invalid && formPost.controls.titulo.touched">
               <div class="invalid-feedback">Ingresá un título de hasta 100 caracteres.</div>
             </div>
             <div class="mb-3">
               <label class="form-label" for="post-descripcion">Descripción</label>
               <textarea id="post-descripcion" rows="4" class="form-control" formControlName="descripcion"
+                        placeholder="¿Qué querés contarle a la comunidad?"
                         [class.is-invalid]="formPost.controls.descripcion.invalid && formPost.controls.descripcion.touched"></textarea>
               <div class="invalid-feedback">Ingresá una descripción de hasta 1000 caracteres.</div>
             </div>
             <div class="mb-1">
-              <label class="form-label" for="post-imagen">Imagen (opcional)</label>
+              <label class="form-label" for="post-imagen"><i class="bi bi-image me-2"></i>Imagen (opcional)</label>
               <input id="post-imagen" type="file" class="form-control" accept="image/*"
                      [class.is-invalid]="errorImagen()" (change)="onArchivo($event)">
               <div class="invalid-feedback">{{ errorImagen() }}</div>
@@ -82,18 +182,19 @@
 }
 
 @if (porEliminar(); as publicacion) {
-  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
-    <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-backdrop-glass" (click)="cancelarEliminar()">
+    <div class="modal-dialog modal-dialog-centered" role="dialog" aria-modal="true"
+         (click)="$event.stopPropagation()">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Eliminar publicación</h5>
+          <h2 class="modal-title h5">Dar de baja publicación</h2>
         </div>
         <div class="modal-body">
-          <p class="mb-0">¿Querés eliminar «{{ publicacion.titulo }}»? Esta acción no se puede deshacer.</p>
+          <p class="mb-0">¿Querés ocultar «{{ publicacion.titulo }}»? La publicación y sus comentarios dejarán de estar disponibles.</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary" (click)="cancelarEliminar()">Cancelar</button>
-          <button type="button" class="btn btn-danger" (click)="confirmarEliminar()">Eliminar</button>
+          <button type="button" class="btn btn-danger" (click)="confirmarEliminar()">Dar de baja</button>
         </div>
       </div>
     </div>
@@ -101,8 +202,8 @@
 }
 
 @if (modalError(); as error) {
-  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
-    <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-backdrop-glass">
+    <div class="modal-dialog modal-dialog-centered" role="alertdialog" aria-modal="true">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{ error.titulo }}</h5>

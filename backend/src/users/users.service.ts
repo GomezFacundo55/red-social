@@ -97,6 +97,20 @@ export class UsersService {
     return { items, total, offset: desde, limit: cantidad };
   }
 
+  async obtenerPerfilPublico(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('El id del usuario no es válido.');
+    }
+    const usuario = await this.userModel
+      .findOne({ _id: id, habilitado: { $ne: false } })
+      .select('nombre apellido usuario perfil imagenPerfil descripcion createdAt')
+      .lean();
+    if (!usuario) {
+      throw new NotFoundException('El usuario no existe o no está habilitado.');
+    }
+    return usuario;
+  }
+
   async cambiarHabilitado(id: string, habilitado: boolean) {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('El id del usuario no es válido.');

@@ -1,13 +1,18 @@
-<main class="container py-4" style="max-width: 760px;">
-  <a routerLink="/publicaciones" class="btn btn-link px-0 mb-2">
-    <i class="bi bi-arrow-left"></i> Volver a publicaciones
+<main class="page-shell detail-page">
+  <a routerLink="/publicaciones" class="detail-back">
+    <span class="icon-tile"><i class="bi bi-arrow-left"></i></span>
+    <span>Volver al feed</span>
   </a>
 
   @if (cargando()) {
-    <p class="text-body-secondary">Cargando publicación...</p>
+    <div class="feed-loading" role="status"><span class="loading-orbit"></span>Cargando historia...</div>
   }
   @if (errorCarga()) {
-    <div class="alert alert-danger">{{ errorCarga() }}</div>
+    <div class="detail-error surface-card">
+      <span class="icon-tile"><i class="bi bi-exclamation-circle"></i></span>
+      <div><h1>Esta historia no está disponible</h1><p>{{ errorCarga() }}</p></div>
+      <a routerLink="/publicaciones" class="btn btn-outline-primary">Volver al feed</a>
+    </div>
   }
 
   @if (publicacion(); as p) {
@@ -15,39 +20,56 @@
                           (alternarMeGusta)="alternarMeGusta($event)"
                           (eliminar)="pedirEliminar($event)" />
 
-    <section class="card shadow-sm">
+    <section class="card comments-panel">
       <div class="card-body">
-        <h2 class="h5 mb-3">Comentarios ({{ totalComentarios() }})</h2>
+        <header class="comments-panel__header">
+          <div class="comments-panel__icon"><i class="bi bi-chat-square-heart"></i></div>
+          <div>
+            <h2>Conversación</h2>
+            <p>{{ totalComentarios() }} {{ totalComentarios() === 1 ? 'comentario' : 'comentarios' }}</p>
+          </div>
+        </header>
 
-        <form [formGroup]="formComentario" (ngSubmit)="comentar()" novalidate class="mb-4">
+        <form [formGroup]="formComentario" (ngSubmit)="comentar()" novalidate class="comment-composer">
           <textarea rows="2" class="form-control mb-2" formControlName="texto"
-                    placeholder="Escribí un comentario..."
+                    placeholder="Sumate a la conversación..." aria-label="Escribí un comentario"
                     [class.is-invalid]="formComentario.controls.texto.invalid && formComentario.controls.texto.touched"></textarea>
           @if (formComentario.controls.texto.invalid && formComentario.controls.texto.touched) {
             <div class="text-danger small mb-2">Escribí un comentario de hasta 500 caracteres.</div>
           }
-          <div class="text-end">
+          <div class="comment-composer__footer">
+            <span><i class="bi bi-emoji-smile"></i> Sé amable y respetuoso.</span>
             <button type="submit" class="btn btn-primary btn-sm" [disabled]="enviando()">
-              {{ enviando() ? 'Enviando...' : 'Comentar' }}
+              <i class="bi bi-send-fill me-2"></i>{{ enviando() ? 'Enviando...' : 'Comentar' }}
             </button>
           </div>
         </form>
 
+        <div class="comment-list">
         @for (c of comentarios(); track c._id) {
-          <div class="d-flex gap-2 mb-3">
-            <img [src]="c.autor.imagenPerfil | urlImagen" alt="" width="36" height="36"
-                 class="rounded-circle object-fit-cover">
-            <div class="flex-grow-1">
-              <div class="small">
-                <strong>{{ c.autor.nombre }} {{ c.autor.apellido }}</strong>
-                <span class="text-body-secondary"> · {{ c.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+          <article class="comment-item">
+            <a class="comment-item__avatar-link" [routerLink]="['/usuarios', c.autor._id]"
+               [attr.aria-label]="'Ver el perfil de ' + c.autor.nombre + ' ' + c.autor.apellido">
+              <img [src]="c.autor.imagenPerfil | urlImagen" alt="" class="comment-item__avatar">
+            </a>
+            <div class="comment-item__content">
+              <div class="comment-item__bubble">
+                <div class="comment-item__meta">
+                  <strong>
+                    <a class="comment-item__profile-link" [routerLink]="['/usuarios', c.autor._id]">
+                      {{ c.autor.nombre }} {{ c.autor.apellido }}
+                    </a>
+                  </strong>
+                  <span>{{ c.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                <div class="text-break">{{ c.texto }}</div>
                 @if (c.modificado) {
-                  <span class="text-body-secondary fst-italic"> · editado</span>
+                  <small class="comment-item__edited"><i class="bi bi-pencil-square"></i> editado</small>
                 }
               </div>
 
               @if (editandoId() === c._id) {
-                <form [formGroup]="formEdicion" (ngSubmit)="guardarEdicion(c)" novalidate>
+                <form class="comment-edit" [formGroup]="formEdicion" (ngSubmit)="guardarEdicion(c)" novalidate>
                   <textarea rows="2" class="form-control mb-2" formControlName="texto"
                             [class.is-invalid]="formEdicion.controls.texto.invalid && formEdicion.controls.texto.touched"></textarea>
                   <button type="submit" class="btn btn-primary btn-sm me-2" [disabled]="guardandoEdicion()">
@@ -57,26 +79,32 @@
                           (click)="cancelarEdicion()">Cancelar</button>
                 </form>
               } @else {
-                <div class="text-break">{{ c.texto }}</div>
                 @if (esMio(c)) {
-                  <button type="button" class="btn btn-link btn-sm px-0" (click)="empezarEdicion(c)">Editar</button>
+                  <button type="button" class="comment-edit-link" (click)="empezarEdicion(c)">
+                    <i class="bi bi-pencil"></i> Editar
+                  </button>
                 }
               }
             </div>
-          </div>
+          </article>
         } @empty {
           @if (cargandoComentarios()) {
-            <p class="text-body-secondary mb-0">Cargando comentarios...</p>
+            <div class="comment-empty"><span class="loading-orbit"></span><p>Cargando conversación...</p></div>
           } @else {
-            <p class="text-body-secondary mb-0">Todavía no hay comentarios. Sé la primera persona en comentar.</p>
+            <div class="comment-empty">
+              <span class="icon-tile"><i class="bi bi-chat-dots"></i></span>
+              <p>Todavía no hay comentarios.<br><strong>¿Querés iniciar la conversación?</strong></p>
+            </div>
           }
         }
+        </div>
 
         @if (hayMas()) {
-          <div class="text-center">
-            <button type="button" class="btn btn-outline-primary btn-sm"
+          <div class="text-center mt-3">
+            <button type="button" class="btn btn-outline-primary btn-sm load-comments"
                     [disabled]="cargandoComentarios()" (click)="cargarComentarios()">
-              {{ cargandoComentarios() ? 'Cargando...' : 'Cargar más comentarios' }}
+              <i class="bi bi-arrow-down-circle me-2"></i>
+              {{ cargandoComentarios() ? 'Cargando...' : 'Ver más comentarios' }}
             </button>
           </div>
         }
@@ -86,8 +114,9 @@
 </main>
 
 @if (porEliminar(); as publicacion) {
-  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
-    <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-backdrop-glass" (click)="cancelarEliminar()">
+    <div class="modal-dialog modal-dialog-centered" role="dialog" aria-modal="true"
+         (click)="$event.stopPropagation()">
       <div class="modal-content">
         <div class="modal-header">
           <h2 class="modal-title h5">Eliminar publicación</h2>
@@ -109,8 +138,8 @@
 }
 
 @if (modalError(); as error) {
-  <div class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5)">
-    <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-backdrop-glass">
+    <div class="modal-dialog modal-dialog-centered" role="alertdialog" aria-modal="true">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{ error.titulo }}</h5>

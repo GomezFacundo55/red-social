@@ -13,6 +13,7 @@ export const routes: Routes = [
   { path: 'registro', component: Registro },
   { path: 'publicaciones', component: Publicaciones, canActivate: [authGuard] },
   { path: 'mi-perfil', component: MiPerfil, canActivate: [authGuard] },
+  { path: 'usuarios/:id', component: MiPerfil, canActivate: [authGuard] },
   { path: 'publicaciones/:id', component: PublicacionDetalle, canActivate: [authGuard] },
   {
     path: 'dashboard/usuarios',

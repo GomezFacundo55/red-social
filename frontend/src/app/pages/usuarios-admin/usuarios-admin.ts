@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { UsuarioAdmin } from '../../models/usuario-admin';
 import { InicialesPipe } from '../../pipes/iniciales.pipe';
 import { UrlImagenPipe } from '../../pipes/url-imagen.pipe';
@@ -19,6 +20,7 @@ const POR_PAGINA = 10;
   selector: 'app-usuarios-admin',
   imports: [
     DatePipe,
+    RouterLink,
     ReactiveFormsModule,
     InicialesPipe,
     UrlImagenPipe,

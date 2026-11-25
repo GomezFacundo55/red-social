@@ -22,4 +22,19 @@ export class StatsController {
   comentariosPorPublicacion(@Query('desde') desde: string, @Query('hasta') hasta: string) {
     return this.statsService.comentariosPorPublicacion(desde, hasta);
   }
+
+  @Get('logins-por-usuario')
+  loginsPorUsuario(@Query('desde') desde: string, @Query('hasta') hasta: string) {
+    return this.statsService.loginsPorUsuario(desde, hasta);
+  }
+
+  @Get('visitas-perfil')
+  visitasPerfilPorUsuario(@Query('desde') desde: string, @Query('hasta') hasta: string) {
+    return this.statsService.visitasPerfilPorUsuario(desde, hasta);
+  }
+
+  @Get('me-gusta-por-fecha')
+  meGustaPorFecha(@Query('desde') desde: string, @Query('hasta') hasta: string) {
+    return this.statsService.meGustaPorFecha(desde, hasta);
+  }
 }

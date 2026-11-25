@@ -27,12 +27,16 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import type { UsuarioToken } from '../auth/jwt-auth.guard.js';
 import { CrearUsuarioDto } from '../auth/dto/crear-usuario.dto.js';
 import { UsersService } from './users.service.js';
+import { ActivityService } from '../activity/activity.service.js';
 
 type PeticionConUsuario = { usuario: UsuarioToken };
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private activityService: ActivityService,
+  ) {}
 
   // Pública a propósito: las fotos se piden con <img>, que no puede enviar el token
   @Get('imagen/:id')
@@ -56,6 +60,14 @@ export class UsersController {
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
   ) {
     return this.usersService.listar(offset, limit);
+  }
+
+  @Get(':id/perfil')
+  @UseGuards(JwtAuthGuard)
+  async perfil(@Req() req: PeticionConUsuario, @Param('id') id: string) {
+    const perfil = await this.usersService.obtenerPerfilPublico(id);
+    await this.activityService.registrarVisitaPerfil(req.usuario.sub, perfil._id.toString());
+    return perfil;
   }
 
   @Post()

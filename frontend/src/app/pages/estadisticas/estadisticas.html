@@ -1,12 +1,19 @@
-<main class="container py-4 stats-page">
-  <header class="mb-4">
-    <p class="text-uppercase text-primary fw-semibold small mb-1">Administración</p>
-    <h1 class="h2 mb-1">Estadísticas</h1>
-    <p class="text-body-secondary mb-0">Actividad de la comunidad dentro del período seleccionado.</p>
+<main class="page-shell stats-page">
+  <header class="stats-heading">
+    <div>
+      <p class="page-eyebrow">Centro de control</p>
+      <h1 class="page-title">Estadísticas</h1>
+      <p class="page-subtitle">Una mirada a la actividad y las conversaciones de la comunidad.</p>
+    </div>
+    <span class="stats-heading__mark"><i class="bi bi-graph-up-arrow"></i></span>
   </header>
 
-  <form class="card card-body shadow-sm mb-4 stats-filter" [formGroup]="rango"
+  <form class="card stats-filter" [formGroup]="rango"
         (ngSubmit)="consultar()">
+    <div class="stats-filter__intro">
+      <span class="icon-tile"><i class="bi bi-calendar-range"></i></span>
+      <div><strong>Elegí un período</strong><small>Las métricas se recalculan con las fechas seleccionadas.</small></div>
+    </div>
     <div class="row align-items-end g-3">
       <div class="col-sm-5 col-lg-4">
         <label for="stats-desde" class="form-label">Desde</label>
@@ -18,7 +25,8 @@
       </div>
       <div class="col-sm-2">
         <button class="btn btn-primary w-100" type="submit" [disabled]="cargando()">
-          {{ cargando() ? 'Cargando...' : 'Aplicar' }}
+          <i class="bi bi-arrow-repeat me-2" [class.spin-icon]="cargando()"></i>
+          {{ cargando() ? 'Actualizando' : 'Aplicar filtros' }}
         </button>
       </div>
     </div>
@@ -28,34 +36,88 @@
     <div class="alert alert-danger" role="alert">{{ error() }}</div>
   }
 
-  <div class="row g-4">
+  <div class="stats-grid">
     <div class="col-12">
-      <section class="card shadow-sm h-100">
+      <section class="card stats-card">
         <div class="card-body">
-          <h2 class="h5">Publicaciones por usuario</h2>
-          <p class="small text-body-secondary">Cantidad de publicaciones no dadas de baja.</p>
+          <div class="stats-card__heading">
+            <span class="stats-card__icon stats-card__icon--purple"><i class="bi bi-people"></i></span>
+            <span><h2>Publicaciones por usuario</h2>
+              <p>Actividad de publicación durante el período.</p></span>
+            <span class="stats-card__index">01</span>
+          </div>
           <app-estadistica-grafico titulo="Publicaciones por usuario"
                                   tipo="barras" [puntos]="publicaciones()" />
         </div>
       </section>
     </div>
     <div class="col-12">
-      <section class="card shadow-sm h-100">
+      <section class="card stats-card">
         <div class="card-body">
-          <h2 class="h5">Comentarios a lo largo del tiempo</h2>
-          <p class="small text-body-secondary">Evolución diaria, solo en publicaciones activas.</p>
+          <div class="stats-card__heading">
+            <span class="stats-card__icon stats-card__icon--blue"><i class="bi bi-chat-dots"></i></span>
+            <span><h2>Conversaciones en el tiempo</h2>
+              <p>Comentarios diarios en publicaciones activas.</p></span>
+            <span class="stats-card__index">02</span>
+          </div>
           <app-estadistica-grafico titulo="Comentarios por fecha"
                                   tipo="linea" [puntos]="comentariosPorDia()" />
         </div>
       </section>
     </div>
     <div class="col-12">
-      <section class="card shadow-sm h-100">
+      <section class="card stats-card">
         <div class="card-body">
-          <h2 class="h5">Comentarios por publicación</h2>
-          <p class="small text-body-secondary">Distribución de comentarios dentro del período.</p>
+          <div class="stats-card__heading">
+            <span class="stats-card__icon stats-card__icon--pink"><i class="bi bi-pie-chart"></i></span>
+            <span><h2>Publicaciones que generan conversación</h2>
+              <p>Distribución de comentarios por historia.</p></span>
+            <span class="stats-card__index">03</span>
+          </div>
           <app-estadistica-grafico titulo="Comentarios por publicación"
                                   tipo="dona" [puntos]="comentariosPorPublicacion()" />
+        </div>
+      </section>
+    </div>
+    <div class="col-12">
+      <section class="card stats-card">
+        <div class="card-body">
+          <div class="stats-card__heading">
+            <span class="stats-card__icon stats-card__icon--blue"><i class="bi bi-box-arrow-in-right"></i></span>
+            <span><h2>Ingresos por usuario</h2>
+              <p>Cantidad de inicios de sesión durante el período.</p></span>
+            <span class="stats-card__index">04</span>
+          </div>
+          <app-estadistica-grafico titulo="Ingresos por usuario"
+                                  tipo="barras" [puntos]="loginsPorUsuario()" />
+        </div>
+      </section>
+    </div>
+    <div class="col-12">
+      <section class="card stats-card">
+        <div class="card-body">
+          <div class="stats-card__heading">
+            <span class="stats-card__icon stats-card__icon--purple"><i class="bi bi-person-lines-fill"></i></span>
+            <span><h2>Visitas a perfiles</h2>
+              <p>Visitas de otros usuarios; no se cuentan las propias.</p></span>
+            <span class="stats-card__index">05</span>
+          </div>
+          <app-estadistica-grafico titulo="Visitas a perfiles"
+                                  tipo="dona" [puntos]="visitasPerfil()" />
+        </div>
+      </section>
+    </div>
+    <div class="col-12">
+      <section class="card stats-card">
+        <div class="card-body">
+          <div class="stats-card__heading">
+            <span class="stats-card__icon stats-card__icon--pink"><i class="bi bi-heart-fill"></i></span>
+            <span><h2>Me gusta por día</h2>
+              <p>Reacciones otorgadas por día durante el período.</p></span>
+            <span class="stats-card__index">06</span>
+          </div>
+          <app-estadistica-grafico titulo="Me gusta por día"
+                                  tipo="linea" [puntos]="meGustaPorDia()" />
         </div>
       </section>
     </div>
