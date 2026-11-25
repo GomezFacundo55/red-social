@@ -16,6 +16,13 @@ describe('UrlImagenPipe', () => {
     );
   });
 
+  it('resolves legacy upload URLs against the configured API', () => {
+    const filename = 'c53dcae9-42b3-4f1d-a404-e3610b0038b3.jpg';
+    expect(pipe.transform(`http://localhost:3000/uploads/${filename}`)).toBe(
+      `${api}/uploads/${filename}`,
+    );
+  });
+
   it('leaves unrelated image URLs unchanged', () => {
     const external = 'https://images.example.com/avatar.png';
     expect(pipe.transform(external)).toBe(external);

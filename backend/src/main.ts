@@ -17,9 +17,7 @@ async function crearApp() {
     origin: [process.env.FRONTEND_URL ?? '', 'http://localhost:4200'],
   });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-  if (!process.env.VERCEL) {
-    app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads/' });
-  }
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads/' });
   return app;
 }
 
