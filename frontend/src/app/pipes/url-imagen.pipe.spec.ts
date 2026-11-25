@@ -16,10 +16,10 @@ describe('UrlImagenPipe', () => {
     );
   });
 
-  it('resolves legacy upload URLs against the configured API', () => {
+  it('normalizes legacy upload URLs to frontend static assets', () => {
     const filename = 'c53dcae9-42b3-4f1d-a404-e3610b0038b3.jpg';
     expect(pipe.transform(`http://localhost:3000/uploads/${filename}`)).toBe(
-      `${api}/uploads/${filename}`,
+      `/uploads/${filename}`,
     );
   });
 

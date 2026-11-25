@@ -13,6 +13,6 @@ export class UrlImagenPipe implements PipeTransform {
     const imagenLegada = url.match(
       /\/uploads\/([a-f\d]{8}(?:-[a-f\d]{4}){3}-[a-f\d]{12}\.(?:jpe?g|png|webp))(?:[?#].*)?$/i,
     );
-    return imagenLegada ? `${this.api}/uploads/${imagenLegada[1]}` : url;
+    return imagenLegada ? `/uploads/${imagenLegada[1]}` : url;
   }
 }
