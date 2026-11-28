@@ -47,8 +47,9 @@ export class Registro {
 
     if (!archivo) return;
 
-    if (!archivo.type.startsWith('image/')) {
-      this.errorImagen = 'El archivo debe ser una imagen.';
+    const tiposPermitidos = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!tiposPermitidos.includes(archivo.type)) {
+      this.errorImagen = 'La imagen debe ser JPG, PNG, WEBP o GIF.';
       return;
     }
     if (archivo.size > 2 * 1024 * 1024) {
