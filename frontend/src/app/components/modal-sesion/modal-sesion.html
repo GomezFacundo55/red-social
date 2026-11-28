@@ -1,21 +1,76 @@
-@if (sesion.modal() === 'por-vencer') {
-  <div class="modal-backdrop-glass">
-    <div class="modal-dialog modal-dialog-centered" role="dialog" aria-modal="true">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Tu sesión está por vencer</h5>
+@if (sesion.modal() === 'aviso') {
+  <aside
+    class="session-notice"
+    role="status"
+    aria-live="polite"
+    aria-labelledby="session-notice-title"
+    aria-describedby="session-notice-description"
+  >
+    <div class="session-notice__card">
+      <span class="session-modal__icon session-notice__icon" aria-hidden="true">
+        <i class="bi bi-clock-history"></i>
+      </span>
+      <div class="session-notice__copy">
+        <h2 id="session-notice-title" class="session-notice__title">Tu sesión vence pronto</h2>
+        <p id="session-notice-description" class="session-notice__description">
+          Quedan <strong>{{ sesion.textoRestante() }}</strong
+          >. Podés seguir usando la red social; te volveremos a avisar antes de que venza.
+        </p>
+        <div class="session-modal__countdown session-modal__countdown--quiet" aria-live="off">
+          <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+          <span>{{ sesion.textoRestante() }}</span>
         </div>
-        <div class="modal-body">
-          <p class="mb-0">Te quedan 5 minutos de sesión. ¿Querés extenderla?</p>
+        <button type="button" class="session-notice__dismiss" (click)="sesion.descartarAviso()">
+          Seguir usando la red
+        </button>
+      </div>
+    </div>
+  </aside>
+} @else if (sesion.modal() === 'por-vencer') {
+  <div class="modal-backdrop-glass">
+    <div
+      class="modal-dialog modal-dialog-centered session-modal-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="session-choice-title"
+      aria-describedby="session-choice-description"
+    >
+      <div class="modal-content session-modal">
+        <div class="modal-body session-modal__body">
+          <span class="session-modal__icon session-modal__icon--choice" aria-hidden="true">
+            <i class="bi bi-person-check"></i>
+          </span>
+          <p class="session-modal__eyebrow">Tu cuenta</p>
+          <h2 id="session-choice-title" class="modal-title session-modal__title">
+            ¿Querés seguir conectado?
+          </h2>
+          <p id="session-choice-description" class="session-modal__description">
+            Extendé la sesión para seguir conectado. Si elegís no extenderla, se cerrará tu sesión.
+          </p>
+          <div class="session-modal__countdown session-modal__countdown--quiet" aria-live="off">
+            <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+            <span>Vence en {{ sesion.textoRestante() }}</span>
+          </div>
           @if (sesion.errorExtender()) {
-            <p class="text-danger small mt-2 mb-0">{{ sesion.errorExtender() }}</p>
+            <p class="session-modal__error" role="alert">{{ sesion.errorExtender() }}</p>
           }
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" [disabled]="sesion.extendiendo()"
-                  (click)="sesion.cerrarSesion()">Cerrar sesión</button>
-          <button type="button" class="btn btn-primary" [disabled]="sesion.extendiendo()"
-                  (click)="sesion.extender()">
+        <div class="modal-footer session-modal__footer session-modal__footer--choices">
+          <button
+            type="button"
+            class="btn session-modal__logout"
+            [disabled]="sesion.extendiendo()"
+            (click)="sesion.cerrarSesion()"
+          >
+            No extender
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary session-modal__extend"
+            [disabled]="sesion.extendiendo()"
+            (click)="sesion.extender()"
+          >
+            <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
             {{ sesion.extendiendo() ? 'Extendiendo...' : 'Extender sesión' }}
           </button>
         </div>
@@ -33,7 +88,9 @@
           <p class="mb-0">Iniciá sesión de nuevo para seguir usando la aplicación.</p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" (click)="sesion.aceptarVencida()">Aceptar</button>
+          <button type="button" class="btn btn-primary" (click)="sesion.aceptarVencida()">
+            Aceptar
+          </button>
         </div>
       </div>
     </div>

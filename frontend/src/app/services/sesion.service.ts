@@ -2,9 +2,10 @@ import { Injectable, computed, effect, inject, signal, untracked } from '@angula
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
-type EstadoModal = 'por-vencer' | 'vencida' | null;
+type EstadoModal = 'aviso' | 'por-vencer' | 'vencida' | null;
 
-const AVISO_ANTES_MS = 30 * 1000; // PRUEBA: avisar 30 segundos antes. Valor real del enunciado: 5 * 60 * 1000
+const AVISO_ANTES_MS = 30 * 1000;
+const DECISION_ANTES_MS = 10 * 1000;
 const RUTAS_PUBLICAS = ['/login', '/registro'];
 
 @Injectable({ providedIn: 'root' })
@@ -19,16 +20,18 @@ export class SesionService {
   restante = signal(0);
 
   textoRestante = computed(() => {
-    const segundos = Math.round(this.restante() / 1000);
+    const segundos = Math.ceil(this.restante() / 1000);
     if (segundos >= 60) {
-      const minutos = Math.round(segundos / 60);
+      const minutos = Math.ceil(segundos / 60);
       return `${minutos} ${minutos === 1 ? 'minuto' : 'minutos'}`;
     }
     return `${segundos} segundos`;
   });
 
   private temporizadorAviso?: ReturnType<typeof setTimeout>;
+  private temporizadorDecision?: ReturnType<typeof setTimeout>;
   private temporizadorVencimiento?: ReturnType<typeof setTimeout>;
+  private temporizadorCuentaRegresiva?: ReturnType<typeof setInterval>;
 
   constructor() {
     // Cada vez que cambia el vencimiento (login, refresco, cierre), se reprograman los avisos
@@ -68,6 +71,7 @@ export class SesionService {
       next: ({ token }) => {
         this.auth.actualizarToken(token);
         this.modal.set(null);
+        this.restante.set(0);
         this.extendiendo.set(false);
       },
       error: () => {
@@ -95,6 +99,10 @@ export class SesionService {
     this.modal.set(null);
   }
 
+  descartarAviso() {
+    if (this.modal() === 'aviso') this.modal.set(null);
+  }
+
   private terminar(destino: string | null) {
     const navegacion = destino
       ? this.router.navigate([destino], { replaceUrl: true })
@@ -104,20 +112,43 @@ export class SesionService {
 
   private programar(vencimiento: number | null) {
     clearTimeout(this.temporizadorAviso);
+    clearTimeout(this.temporizadorDecision);
     clearTimeout(this.temporizadorVencimiento);
-    if (vencimiento === null) return;
+    clearInterval(this.temporizadorCuentaRegresiva);
+    if (vencimiento === null) {
+      this.restante.set(0);
+      return;
+    }
 
     const msRestantes = vencimiento - Date.now();
     if (msRestantes <= 0) {
       this.expirar();
       return;
     }
-    if (this.modal() === 'por-vencer') this.modal.set(null);
+    if (this.modal() === 'aviso' || this.modal() === 'por-vencer') this.modal.set(null);
 
-    this.temporizadorAviso = setTimeout(() => {
-      this.restante.set(Math.max(vencimiento - Date.now(), 0));
+    const actualizarRestante = () => this.restante.set(Math.max(vencimiento - Date.now(), 0));
+    if (msRestantes <= DECISION_ANTES_MS) {
+      actualizarRestante();
       this.modal.set('por-vencer');
-    }, Math.max(msRestantes - AVISO_ANTES_MS, 0));
+      this.temporizadorCuentaRegresiva = setInterval(actualizarRestante, 1000);
+    } else {
+      this.temporizadorAviso = setTimeout(
+        () => {
+          actualizarRestante();
+          this.modal.set('aviso');
+          this.temporizadorCuentaRegresiva = setInterval(actualizarRestante, 1000);
+        },
+        Math.max(msRestantes - AVISO_ANTES_MS, 0),
+      );
+      this.temporizadorDecision = setTimeout(
+        () => {
+          actualizarRestante();
+          this.modal.set('por-vencer');
+        },
+        Math.max(msRestantes - DECISION_ANTES_MS, 0),
+      );
+    }
 
     this.temporizadorVencimiento = setTimeout(() => this.expirar(), msRestantes);
   }

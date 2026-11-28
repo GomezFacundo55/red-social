@@ -22,6 +22,24 @@
   min-width: 0;
 }
 
+.register-card .form-control.is-invalid {
+  border-color: #ff647c;
+  box-shadow: 0 0 0 3px rgba(255, 100, 124, 0.12);
+}
+
+.register-card .form-control.is-invalid:focus {
+  border-color: #ff647c;
+  box-shadow: 0 0 0 4px rgba(255, 100, 124, 0.2);
+}
+
+.register-card .invalid-feedback {
+  margin-top: 0.4rem;
+  color: #ff7185;
+  font-size: 0.82rem;
+  font-weight: 550;
+  line-height: 1.45;
+}
+
 .field-wide {
   grid-column: 1 / -1;
 }
